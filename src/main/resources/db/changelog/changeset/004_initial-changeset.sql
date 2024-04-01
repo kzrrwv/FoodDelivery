@@ -1,0 +1,1 @@
+INSERT INTO postgres.public.warehouse VALUES (0), (1)

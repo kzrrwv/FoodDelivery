@@ -23,4 +23,6 @@ public interface UserService {
     UserDetailsService userDetailsService();
 
     UserToRetrieve getUserById(Long id);
+
+    UserToRetrieve updateCurrentUser(UserDTO userDTO);
 }

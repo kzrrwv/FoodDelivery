@@ -78,9 +78,10 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.ROLE_USER);
         }
         repository.save(user);
-        log.info("Пользователь" + user.getUsername() +  "успешно создан.");
+        log.info("Пользователь " + user.getUsername() +  " успешно создан.");
     }
 
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public List<UserToRetrieve> getUsers(){
         List<User> all = repository.findAll();
         List<UserToRetrieve> userToRetrieves = new ArrayList<>();
@@ -139,6 +140,13 @@ public class UserServiceImpl implements UserService {
         dto.setRole(saved.getRole().name());
         log.info("Пользователь с id {} успешно обновлен!", id);
         return dto;
+    }
+
+    //проверка на текущего пользователя
+    @Override
+    @PreAuthorize(value = "hasRole('ROLE_USER')")
+    public UserToRetrieve updateCurrentUser(UserDTO userDTO) {
+        return null;
     }
 
     @Override

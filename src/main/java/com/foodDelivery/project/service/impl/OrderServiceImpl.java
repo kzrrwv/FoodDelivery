@@ -1,11 +1,9 @@
 package com.foodDelivery.project.service.impl;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
+import com.foodDelivery.project.domen.dto.ProductAndAmount;
 import com.foodDelivery.project.domen.dto.ReviewDTO;
-import com.foodDelivery.project.domen.model.Order;
-import com.foodDelivery.project.domen.model.OrderItem;
-import com.foodDelivery.project.domen.model.Product;
-import com.foodDelivery.project.domen.model.User;
+import com.foodDelivery.project.domen.model.*;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
@@ -21,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,14 +47,35 @@ public class OrderServiceImpl implements OrderService {
         this.productRepository = productRepository;
     }
 
+    private User getCurrentUser() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username = authentication.getName();
+
+        return userRepository.findUserByUsername(username)
+                .orElseThrow(() ->
+                        new BusinessException(
+                                "Пользователь не найден",
+                                HttpStatus.NOT_FOUND
+                        ));
+    }
+
     //доделать заполнение заказа продуктами из orderItems
     //при заказе уменьшать количество продуктов на складе
+    //при создание нового заказа мы создаем новый orderItem, который берет доступные продукты со склада и убирает их со склада и добавляет их в orderItem
+    //будем добавлять все orderItem в нулевой склад
     @Override
     @Transactional
     @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public void createOrder(OrderDTO orderDTO){
         Order order = new Order();
-//        repository.save(order);
+
+        User currentUser = getCurrentUser();
+        order.setUser_id(currentUser);
 
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setDeliveryFee(orderDTO.getDeliveryFee());
@@ -66,17 +87,10 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() -> new BusinessException("Курьер не найден!", HttpStatus.NOT_FOUND));
         order.setCourier_id(courier);
 
+        //!!
         List<OrderItem> items = new ArrayList<>();
-
-        for (OrderItem item : orderDTO.getOrderItems()) {
-
-            Product product = item.getProduct_id();
-
-            if (product == null) {
-                throw new BusinessException(
-                        "Продукт отсутствует!",
-                        HttpStatus.BAD_REQUEST);
-            }
+        List<ProductAndAmount> productsId = orderDTO.getProductsId();
+        for(ProductAndAmount product : productsId){
 
             Product dbProduct = productRepository.findById(product.getId())
                     .orElseThrow(() ->
@@ -90,12 +104,16 @@ public class OrderServiceImpl implements OrderService {
                         HttpStatus.BAD_REQUEST);
             }
 
-            dbProduct.setAmount(dbProduct.getAmount() - 1);
+            dbProduct.setAmount(dbProduct.getAmount() - product.getAmount());
+
+            productRepository.save(dbProduct);
+
+            OrderItem item = new OrderItem();
 
             item.setProduct_id(dbProduct);
 
             item.setOrder_id(order);
-
+            item.setPrice(dbProduct.getPrice());
             items.add(item);
         }
 
@@ -115,18 +133,26 @@ public class OrderServiceImpl implements OrderService {
     //получить список заказов по пользователю поменять
     //через userDetails, уже заригистрированный пользователь и мы смотрим есть ли у этого пользователя заказы
     public List<OrderToRetrieve> getOrders(){
-        List<Order> all = repository.findAll();
-        List<OrderToRetrieve> orderToRetrieves = new ArrayList<>();
+        User currentUser = getCurrentUser();
 
-        for(Order order : all){
-            OrderToRetrieve orderToRetrieve = new OrderToRetrieve();
-            orderToRetrieve.setComment(order.getComment());
-            orderToRetrieve.setStatus(order.getStatus());
-            orderToRetrieve.setDeliveryFee(order.getDeliveryFee());
-            orderToRetrieve.setTotalAmount(order.getTotalAmount());
-            orderToRetrieves.add(orderToRetrieve);
+        List<Order> orders =
+                repository.findOrdersByUserId(
+                        currentUser.getId()
+                );
+
+        List<OrderToRetrieve> result = new ArrayList<>();
+
+        for(Order order : orders){
+            OrderToRetrieve dto = new OrderToRetrieve();
+
+            dto.setComment(order.getComment());
+            dto.setStatus(order.getStatus());
+            dto.setDeliveryFee(order.getDeliveryFee());
+            dto.setTotalAmount(order.getTotalAmount());
+
+            result.add(dto);
         }
-        return orderToRetrieves;
+        return result;
     }
 
     @Override
@@ -136,6 +162,14 @@ public class OrderServiceImpl implements OrderService {
                         "Заказ не найден",
                         HttpStatus.NOT_FOUND
                 ));
+        User currentUser = getCurrentUser();
+
+        if (!order.getUser_id().getId().equals(currentUser.getId())) {
+            throw new BusinessException(
+                    "Это не ваш заказ",
+                    HttpStatus.FORBIDDEN
+            );
+        }
 
         OrderToRetrieve dto = new OrderToRetrieve();
         dto.setComment(order.getComment());
@@ -150,7 +184,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     //переделать заказы по пользователю поиск
     public List<OrderToRetrieve> findOrdersWithPageable(PageRequest of) {
-        Page<Order> page = repository.findAll(of);
+        User currentUser = getCurrentUser();
+
+        Page<Order> page =
+                repository.findOrdersByUserId(
+                        currentUser.getId(),
+                        of
+                );
 
         List<OrderToRetrieve> result = new ArrayList<>();
 
@@ -172,12 +212,21 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize(value = "hasRole('ROLE_USER')")
     //сделать проверку является ли заказ пользователя
     //доделать с review
-    public OrderDTO updateOrder(Long id, OrderDTO orderDTO, ReviewDTO reviewDTO) {
+    public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
                         "Заказ не найден",
                         HttpStatus.NOT_FOUND
                 ));
+
+        User currentUser = getCurrentUser();
+
+        if (!order.getUser_id().getId().equals(currentUser.getId())) {
+            throw new BusinessException(
+                    "Это не ваш заказ",
+                    HttpStatus.FORBIDDEN
+            );
+        }
 
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setDeliveryFee(orderDTO.getDeliveryFee());
@@ -185,19 +234,49 @@ public class OrderServiceImpl implements OrderService {
         order.setComment(orderDTO.getComment());
         order.setDeliveredAt(orderDTO.getDeliveredAt());
 
+        Review review = order.getReview_id();
+
+        if (review != null) {
+
+            review.setComment(orderDTO.getComment());
+
+            review.setRating(orderDTO.getRating());
+        }
+
         Order saved = repository.save(order);
 
+        OrderDTO dto = new OrderDTO();
 
+        dto.setComment(saved.getComment());
+        dto.setDeliveryFee(saved.getDeliveryFee());
+        dto.setTotalAmount(saved.getTotalAmount());
+        dto.setDeliveredAt(saved.getDeliveredAt());
+        dto.setPaymentMethod(saved.getPaymentMethod());
+
+        if (saved.getReview_id() != null) {
+            dto.setRating(saved.getReview_id().getRating());
+        }
 
         log.info("Заказ с id {} успешно изменён!", id);
-        return null;
+
+        return dto;
     }
 
+    //с заказом должны удаляться review, orderItem и восстанавливаться количество продутов
     @Override
     @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public void deleteOrder(Long id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));
+
+        User currentUser = getCurrentUser();
+
+        if (!order.getUser_id().getId().equals(currentUser.getId())) {
+            throw new BusinessException(
+                    "Это не ваш заказ",
+                    HttpStatus.FORBIDDEN
+            );
+        }
 
         repository.delete(order);
 

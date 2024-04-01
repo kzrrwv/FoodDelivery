@@ -24,8 +24,8 @@ public class WarehouseController {
 
     @PostMapping
     @Operation(summary = "Создать склад")
-    public ResponseEntity<Void> addWarehouse(@RequestBody @Valid WarehouseDTO warehouseDTO, @PathVariable Long id){
-        warehouseService.createWarehouse(id, warehouseDTO);
+    public ResponseEntity<Void> addWarehouse(@RequestBody @Valid WarehouseDTO warehouseDTO){
+        warehouseService.createWarehouse(warehouseDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

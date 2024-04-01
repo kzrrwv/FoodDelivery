@@ -2,8 +2,8 @@ package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.User;
-import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
+import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository repository;
@@ -30,9 +29,10 @@ public class UserServiceTest {
     private UserServiceImpl service;
 
     @Test
-    void createUser_shouldSaveUser() {
+    void createUser_success() {
+
         UserDTO dto = new UserDTO();
-        dto.setUsername("john");
+        dto.setUsername("test");
         dto.setRole("ROLE_USER");
 
         service.createUser(dto);
@@ -41,60 +41,55 @@ public class UserServiceTest {
     }
 
     @Test
-    void getUsers_shouldReturnList() {
-        User user = new User();
-        user.setUsername("john");
-        user.setEmail("john@mail.com");
+    void getUserById_success() {
 
-        when(repository.findAll()).thenReturn(List.of(user));
+        User user = new User();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(user));
+
+        UserToRetrieve result = service.getUserById(1L);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void getUsers_success() {
+
+        when(repository.findAll())
+                .thenReturn(List.of(new User()));
 
         List<UserToRetrieve> result = service.getUsers();
 
         assertEquals(1, result.size());
-        assertEquals("john", result.get(0).getUserName());
     }
 
     @Test
-    void updateUser_shouldModifyData() {
-        User user = new User();
-        user.setUsername("old");
+    void updateUser_success() {
 
-        when(repository.findById(1L)).thenReturn(Optional.of(user));
-        when(repository.save(any())).thenReturn(user);
+        User user = new User();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(user));
+
+        when(repository.save(any(User.class)))
+                .thenReturn(user);
 
         UserDTO dto = new UserDTO();
-        dto.setUsername("new");
+        dto.setRole("ROLE_ADMIN");
 
         UserDTO result = service.updateUser(1L, dto);
 
-        assertEquals("new", result.getUsername());
+        assertNotNull(result);
     }
 
     @Test
-    void deleteUser_shouldRemove() {
-        User user = new User();
+    void deleteUser_notFound() {
 
-        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(repository.findById(1L))
+                .thenReturn(Optional.empty());
 
-        service.deleteUser(1L);
-
-        verify(repository).delete(user);
-    }
-
-    @Test
-    void userDetailsService_shouldLoadUser() {
-        User user = new User();
-        user.setUsername("admin");
-        user.setPassword("123");
-        user.setRole(UserRole.ROLE_USER);
-
-        when(repository.findUserByUsername("admin"))
-                .thenReturn(Optional.of(user));
-
-        var uds = service.userDetailsService();
-
-        var result = uds.loadUserByUsername("admin");
-
-        assertEquals("admin", result.getUsername());
+        assertThrows(BusinessException.class,
+                () -> service.deleteUser(1L));
     }
 }

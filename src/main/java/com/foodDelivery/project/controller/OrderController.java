@@ -35,7 +35,7 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "Создать заказ")
     @ApiResponse(responseCode = "201", description = "Заказ создан")
-    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDTO orderDTO, @AuthenticationPrincipal UserDetails details){
+    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDTO orderDTO){
         orderService.createOrder(orderDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -61,10 +61,9 @@ public class OrderController {
     @Operation(summary = "Обновить заказ")
     public ResponseEntity<OrderDTO> updateOrder(
             @PathVariable Long id,
-            @RequestBody @Valid OrderDTO orderDTO,
-            @RequestBody @Valid ReviewDTO reviewDTO){
+            @RequestBody @Valid OrderDTO orderDTO){
 
-        return ResponseEntity.ok(orderService.updateOrder(id, orderDTO, reviewDTO));
+        return ResponseEntity.ok(orderService.updateOrder(id, orderDTO));
     }
 
     @DeleteMapping("/{id}")

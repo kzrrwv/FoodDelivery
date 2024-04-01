@@ -19,8 +19,43 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://foodDeliveryPostgres:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=12345
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,metrics,prometheus
+      - MANAGEMENT_METRICS_TAGS_APPLICATION=food-delivery
+      - MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED=true
     depends_on:
       - postgres
+    networks:
+      - food-network
+  prometheus:
+    image: prom/prometheus:v2.51.2
+
+    container_name: foodPrometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    depends_on:
+      - project
+
+    networks:
+      - food-network
+
+  grafana:
+    image: grafana/grafana-oss:10.4.2
+    container_name: foodGrafana
+    ports:
+      - "3000:3000"
+
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+    depends_on:
+      - prometheus
+
     networks:
       - food-network
 networks:

@@ -17,18 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+@PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 public class WarehouseServiceImpl implements WarehouseService {
 
     private WarehouseRepository warehouseRepository;
     private ProductRepository productRepository;
 
+    public WarehouseServiceImpl(WarehouseRepository warehouseRepository, ProductRepository productRepository) {
+        this.warehouseRepository = warehouseRepository;
+        this.productRepository = productRepository;
+    }
+
     @Override
-    public void createWarehouse(Long warehouseId, WarehouseDTO warehouseDTO) {
+    public void createWarehouse(WarehouseDTO warehouseDTO) {
         Warehouse warehouse = new Warehouse();
 
         warehouse.setProducts(warehouseDTO.getProducts());
-        warehouse.setId(warehouseId);
 
         warehouseRepository.save(warehouse);
     }

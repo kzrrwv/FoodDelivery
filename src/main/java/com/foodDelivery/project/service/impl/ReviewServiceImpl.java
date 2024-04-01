@@ -21,7 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//все методы изменения review сделать по пользователю
+//понять preAuthorize
 @Service
 @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 public class ReviewServiceImpl implements ReviewService {
@@ -48,9 +49,12 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public Review createReviewWithOrder(ReviewDTO reviewDTO, Order order) {
         Review review = new Review();
+
         review.setRating(reviewDTO.getRating());
         review.setComment(reviewDTO.getComment());
         review.setOrder_id(order);
+        review.setUser_id(order.getUser_id());
+
         return repository.save(review);
     }
 

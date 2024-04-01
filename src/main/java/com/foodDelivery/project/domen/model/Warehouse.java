@@ -11,6 +11,7 @@ public class Warehouse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //оставить одностороннюю связь
     @OneToMany(mappedBy = "warehouse_id", fetch = FetchType.LAZY)
     private List<Product> products;
 

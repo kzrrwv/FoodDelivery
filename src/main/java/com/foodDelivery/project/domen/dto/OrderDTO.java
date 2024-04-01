@@ -13,7 +13,6 @@ import java.util.List;
 @Schema(title = "endpoint для заказов")
 @Tag(name = "OrderDTO", description = "")
 public class OrderDTO {
-    //добавить два поля из reviewDTO
     @Positive
     private int totalAmount;
 
@@ -26,20 +25,23 @@ public class OrderDTO {
     @Size(max = 500)
     private String comment;
 
-    @Positive
+    @PositiveOrZero
     private int rating;
 
-    @NotNull
-    @PastOrPresent
-    private LocalDateTime createdAt;
-
-    @FutureOrPresent
     private LocalDateTime deliveredAt;
 
     @NotNull
     private PaymentMethod paymentMethod;
 
-    private List<OrderItem> orderItems;
+    private List<ProductAndAmount> productsId;
+
+    public List<ProductAndAmount> getProductsId() {
+        return productsId;
+    }
+
+    public void setProductsId(List<ProductAndAmount> productsId) {
+        this.productsId = productsId;
+    }
 
     public int getTotalAmount() {
         return totalAmount;
@@ -55,10 +57,6 @@ public class OrderDTO {
 
     public String getComment() {
         return comment;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 
     public LocalDateTime getDeliveredAt() {
@@ -85,10 +83,6 @@ public class OrderDTO {
         this.comment = comment;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public void setDeliveredAt(LocalDateTime deliveredAt) {
         this.deliveredAt = deliveredAt;
     }
@@ -103,13 +97,5 @@ public class OrderDTO {
 
     public void setRating(int rating) {
         this.rating = rating;
-    }
-
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
     }
 }

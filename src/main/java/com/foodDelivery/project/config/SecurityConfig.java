@@ -33,14 +33,38 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.csrf(AbstractHttpConfigurer::disable)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .cors(cors -> {})
+                .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/swagger-ui.html", "swagger-ui/**", "/v3/api-docs/**", "/auth/**")
-                                .permitAll().anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        request
+                                .requestMatchers(
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/auth/**",
+                                        "/actuator/**"
+                                )
+                                .permitAll()
+
+                                .anyRequest()
+                                .authenticated()
+                )
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
         return http.build();
     }
 

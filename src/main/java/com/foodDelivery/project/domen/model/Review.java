@@ -20,11 +20,11 @@ public class Review {
     private LocalDateTime createdAt;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @JoinColumn(name = "order_id")
     private Order order_id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private User user_id;
 
     public Review() {

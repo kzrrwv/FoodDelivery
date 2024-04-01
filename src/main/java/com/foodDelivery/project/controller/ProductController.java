@@ -28,10 +28,14 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping
+    @PostMapping("/{warehouse_id}")
     @Operation(summary = "Создать продукт")
-    public ResponseEntity<Void> addProduct(@RequestBody @Valid ProductDTO productDTO, @PathVariable Long warehouse_id){
+    public ResponseEntity<Void> addProduct(
+            @RequestBody @Valid ProductDTO productDTO,
+            @PathVariable Long warehouse_id){
+
         productService.createProduct(productDTO, warehouse_id);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

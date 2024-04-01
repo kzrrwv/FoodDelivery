@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface WarehouseService {
 
-    void createWarehouse(Long warehouseId, WarehouseDTO warehouseDTO);
+    void createWarehouse(WarehouseDTO warehouseDTO);
 
     List<Long> getWarehouses();
 

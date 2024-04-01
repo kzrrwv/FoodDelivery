@@ -94,6 +94,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/io.zonky.test/embedded-postgres -->
+		<dependency>
+			<groupId>io.zonky.test</groupId>
+			<artifactId>embedded-postgres</artifactId>
+			<version>2.2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- 1. Добавляем Spring Boot Actuator (он дает /health, /info, /metrics) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- 2. Добавляем Micrometer Prometheus registry (он создает endpoint /prometheus) -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

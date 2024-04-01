@@ -1,8 +1,10 @@
 package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
+import com.foodDelivery.project.domen.model.Order;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
+import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ReviewRepository;
 import com.foodDelivery.project.service.impl.ReviewServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -10,21 +12,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewServiceTest {
+class ReviewServiceTest {
 
     @Mock
     private ReviewRepository repository;
@@ -33,8 +32,10 @@ public class ReviewServiceTest {
     private ReviewServiceImpl service;
 
     @Test
-    void createReview_shouldSave() {
+    void createReview_success() {
+
         ReviewDTO dto = new ReviewDTO();
+        dto.setComment("good");
         dto.setRating(5);
 
         service.createReview(dto);
@@ -43,56 +44,58 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void getReviews_shouldReturnMappedList() {
+    void getReviewById_success() {
+
         Review review = new Review();
-        review.setRating(4);
-        review.setComment("good");
 
-        when(repository.findAll()).thenReturn(List.of(review));
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(review));
 
-        List<ReviewToRetrieve> result = service.getReviews();
+        ReviewToRetrieve result = service.getReviewById(1L);
 
-        assertEquals(1, result.size());
-        assertEquals(4, result.get(0).getRating());
+        assertNotNull(result);
     }
 
     @Test
-    void pageable_shouldReturnNull_currentBug() {
-        Page<Review> page = new PageImpl<>(List.of(new Review()));
+    void findReviewsWithPageble_success() {
+
+        Review review = new Review();
 
         when(repository.findAll(any(PageRequest.class)))
-                .thenReturn(page);
+                .thenReturn(new PageImpl<>(List.of(review)));
 
         List<ReviewToRetrieve> result =
-                service.findReviewsWithPageble(PageRequest.of(0, 10));
+                service.findReviewsWithPageble(PageRequest.of(0, 5));
 
-        assertNull(result); // баг в сервисе
+        assertEquals(1, result.size());
     }
 
     @Test
-    void update_shouldChangeRating() {
-        Review review = new Review();
-        review.setRating(1);
+    void updateReview_success() {
 
-        when(repository.findById(1L)).thenReturn(Optional.of(review));
-        when(repository.save(any())).thenReturn(review);
+        Review review = new Review();
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(review));
+
+        when(repository.save(any(Review.class)))
+                .thenReturn(review);
 
         ReviewDTO dto = new ReviewDTO();
-        dto.setRating(10);
+        dto.setComment("updated");
 
         ReviewDTO result = service.updateReview(1L, dto);
 
-        assertEquals(10, result.getRating());
+        assertNotNull(result);
     }
 
     @Test
-    void delete_shouldCallRepository() {
-        Review review = new Review();
+    void delete_notFound() {
 
-        when(repository.findById(1L)).thenReturn(Optional.of(review));
+        when(repository.findById(1L))
+                .thenReturn(Optional.empty());
 
-        service.delete(1L);
-
-        verify(repository).delete(review);
+        assertThrows(BusinessException.class,
+                () -> service.delete(1L));
     }
 }

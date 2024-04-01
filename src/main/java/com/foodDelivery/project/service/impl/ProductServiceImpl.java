@@ -77,6 +77,8 @@ public class ProductServiceImpl implements ProductService {
         List<ProductToRetrieve> productToRetrieves = new ArrayList<>();
         for(Product product : all){
             ProductToRetrieve productToRetrieve = new ProductToRetrieve();
+
+            productToRetrieve.setId(product.getId());
             productToRetrieve.setAmount(product.getAmount());
             productToRetrieve.setName(product.getName());
             productToRetrieve.setPrice(product.getPrice());
@@ -94,6 +96,8 @@ public class ProductServiceImpl implements ProductService {
                 ));
 
         ProductToRetrieve dto = new ProductToRetrieve();
+
+        dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setPrice(product.getPrice());
         dto.setAmount(product.getAmount());
@@ -109,6 +113,8 @@ public class ProductServiceImpl implements ProductService {
 
         for(Product product : all.getContent()){
             ProductToRetrieve dto = new ProductToRetrieve();
+
+            dto.setId(product.getId());
             dto.setPrice(product.getPrice());
             dto.setName(product.getName());
             dto.setAmount(product.getAmount());

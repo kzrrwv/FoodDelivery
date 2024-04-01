@@ -33,9 +33,4 @@ public class AuthController {
     public JwtResponse login(@RequestBody LoginRequest loginRequestDTO){
         return service.login(loginRequestDTO);
     }
-
-    @GetMapping("/get")
-    public String get(){
-        return "Достигли";
-    }
 }
