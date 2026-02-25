@@ -1,0 +1,15 @@
+databaseChangelog:
+  - changeset:
+      id: 1
+      author: Christina
+      changes:
+        - createTable:
+            tableName: warehouse
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false

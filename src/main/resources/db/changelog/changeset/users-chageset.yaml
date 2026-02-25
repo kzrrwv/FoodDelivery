@@ -1,0 +1,42 @@
+databaseChangelog:
+  - changeset:
+      id: 1
+      author: Christina
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constrains:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(20)
+                  constrains:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constrains:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(20)
+                  constrains:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constrains:
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(20)
+                  constrains:
+                    nullable: false
+
+
+

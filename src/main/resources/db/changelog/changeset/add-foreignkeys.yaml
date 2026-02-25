@@ -1,0 +1,37 @@
+databaseChangelog:
+  - changeset:
+      id: 1
+      author: Christina
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: fk_orders_users
+            baseTableName: orders
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+        - addForeignKeyConstraint:
+              constraintName: fk_orders_address
+              baseTableName: orders
+              baseColumnNames: address_id
+              referencedTableName: address
+              referencedColumnNames: id
+              onDelete: RESTRICT
+              onUpdate: RESTRICT
+        - addForeignKeyConstraint:
+              constraintName: fk_orders_courier
+              baseTableName: orders
+              baseColumnNames: courier_id
+              referencedTableName: courier
+              referencedColumnNames: id
+              onDelete: SET NULL
+              onUpdate: RESTRICT
+        - addForeignKeyConstraint:
+              constraintName: fk_orders_review
+              baseTableName:
+              baseColumnNames:
+              referencedTableName:
+              referencedColumnNames:
+              onDelete:
+              onUpdate:

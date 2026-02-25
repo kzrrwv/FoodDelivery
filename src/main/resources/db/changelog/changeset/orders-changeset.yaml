@@ -1,0 +1,58 @@
+databaseChangelog:
+  - changeset:
+      id: 1
+      author: Christina
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: total_amount
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: delivery_fee
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: delivered_at
+                  type: TIMESTAMP
+              - column:
+                  name: payment_method
+                  type: VARCHAR(50)
+              - column:
+                  name: address_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: courier_id
+                  type: INT
+              - column:
+                  name: review_id
+                  type: INT

@@ -6,6 +6,8 @@ import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ReviewRepository;
 import com.foodDelivery.project.service.ReviewService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private ReviewRepository repository;
 
+    private static final Logger log = LoggerFactory.getLogger(ReviewServiceImpl.class);
     @Autowired
     public ReviewServiceImpl(ReviewRepository repository) {
         this.repository = repository;
@@ -30,6 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> all = repository.findAll();
 
         if (all.isEmpty()) {
+            log.debug("База данных пустая!");
             throw new BusinessException(
                     "Отзывы отсутствуют",
                     HttpStatus.NOT_FOUND
@@ -49,18 +53,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void saveReviews(ReviewDTO reviewDTO){
-        if (reviewDTO.getRating() < 1 || reviewDTO.getRating() > 5) {
-            throw new BusinessException(
-                    "Рейтинг должен быть от 1 до 5",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
         Review review = new Review();
         review.setRating(reviewDTO.getRating());
         review.setComment(reviewDTO.getComment());
-        review.setCreatedAt(reviewDTO.getCreatedAt());
         repository.save(review);
+        log.info("Отзыв успешно добавлен.");
     }
 
     @Override

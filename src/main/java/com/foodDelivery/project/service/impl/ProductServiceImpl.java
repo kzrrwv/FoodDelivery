@@ -6,6 +6,8 @@ import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ProductRepository;
 import com.foodDelivery.project.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductRepository repository;
 
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
+
     @Autowired
     public ProductServiceImpl(ProductRepository repository) {
         this.repository = repository;
@@ -28,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> all = repository.findAll();
 
         if (all.isEmpty()) {
+            log.debug("База данных пустая!");
             throw new BusinessException(
                     "Продукты не найдены",
                     HttpStatus.NOT_FOUND
@@ -47,24 +52,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void saveProducts(ProductDTO productDTO){
-        if (productDTO.getPrice() <= 0) {
-            throw new BusinessException(
-                    "Цена должна быть больше 0",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        if (productDTO.getAmount() < 0) {
-            throw new BusinessException(
-                    "Количество не может быть отрицательным",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
         Product product = new Product();
         product.setAmount(productDTO.getAmount());
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         repository.save(product);
+        log.info("Продукт успешно добавлен.");
     }
 }

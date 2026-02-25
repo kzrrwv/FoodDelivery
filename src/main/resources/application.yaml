@@ -2,11 +2,13 @@ spring:
   application:
     name: project
   liquibase:
-    enabled: false
+    enabled: false \\убрать когда допишу ключи
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: public
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 12345
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update \\поменять на validate

@@ -7,6 +7,8 @@ import com.foodDelivery.project.domen.responce.UserToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,22 +20,23 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Autowired
     public UserServiceImpl(UserRepository repository) {
         this.repository = repository;
     }
 
-    //ошибка сериализация
     public List<UserToRetrieve> getUsers(){
         List<User> all = repository.findAll();
 
         if (all.isEmpty()) {
+            log.debug("База данных пустая");
             throw new BusinessException(
                     "Пользователи не найдены",
                     HttpStatus.NOT_FOUND
             );
         }
-
         List<UserToRetrieve> userToRetrieves = new ArrayList<>();
         for(User user : all){
             UserToRetrieve userToRetrieve = new UserToRetrieve();
@@ -45,27 +48,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public void saveUsers(UserDTO userDTO){
-        if (userDTO.getUsername() == null || userDTO.getUsername().isBlank()) {
-            throw new BusinessException(
-                    "Имя пользователя обязательно",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        if (userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
-            throw new BusinessException(
-                    "Email обязателен",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        if (userDTO.getPassword() == null || userDTO.getPassword().length() < 4) {
-            throw new BusinessException(
-                    "Пароль должен быть не менее 4 символов",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -74,6 +56,7 @@ public class UserServiceImpl implements UserService {
         try{
             user.setRole(UserRole.valueOf(userDTO.getRole()));
         } catch(IllegalArgumentException e){
+            log.debug("Неправильный формат роли, по умолчанию присваеваем customer.");
             user.setRole(UserRole.CUSTOMER);
         }
         repository.save(user);

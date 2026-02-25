@@ -19,9 +19,8 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "warehouse_id", insertable = false, updatable = false)
-    private Warehouse warehouse;
+    private Warehouse warehouse_id;
 
-    private int warehouse_id;
 
     public Product() {
 
@@ -57,13 +56,5 @@ public class Product {
 
     public void setAmount(int amount) {
         this.amount = amount;
-    }
-
-    public int getWarehouse_id() {
-        return warehouse_id;
-    }
-
-    public void setWarehouse_id(int warehouse_id) {
-        this.warehouse_id = warehouse_id;
     }
 }

@@ -1,0 +1,30 @@
+databaseChangelog:
+  - changeset:
+      id: 1
+      author: Christina
+      changes:
+        - createTable:
+            tableName: order_item
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: price
+                  type: INT
+                  constraints:
+                  nullable: false
+              - column:
+                  name: order_id
+                  type: INT
+                  constraints:
+                     nullable: false
+              - column:
+                  name: product_id
+                  type: INT
+                  constraints:
+                      nullable: false
