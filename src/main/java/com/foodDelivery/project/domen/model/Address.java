@@ -25,8 +25,7 @@ public class Address {
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
-    private int user_id;
+    private User user_id;
 
     public Address() {
 
@@ -86,13 +85,5 @@ public class Address {
 
     public void setFloor(int floor) {
         this.floor = floor;
-    }
-
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
     }
 }

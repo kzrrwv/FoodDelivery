@@ -15,8 +15,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "product_id", insertable = false, updatable = false)
-    private Product product;
-    private int product_id;
+    private Product product_id;
 
     public OrderItem() {
 
@@ -36,13 +35,5 @@ public class OrderItem {
 
     public void setPrice(int price) {
         this.price = price;
-    }
-
-    public int getProduct_id() {
-        return product_id;
-    }
-
-    public void setProduct_id(int product_id) {
-        this.product_id = product_id;
     }
 }

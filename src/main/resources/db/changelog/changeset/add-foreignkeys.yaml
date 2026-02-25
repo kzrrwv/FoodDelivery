@@ -29,9 +29,57 @@ databaseChangelog:
               onUpdate: RESTRICT
         - addForeignKeyConstraint:
               constraintName: fk_orders_review
-              baseTableName:
-              baseColumnNames:
-              referencedTableName:
-              referencedColumnNames:
-              onDelete:
-              onUpdate:
+              baseTableName: orders
+              baseColumnNames: review_id
+              referencedTableName: review
+              referencedColumnNames: id
+              onDelete: SET NULL
+              onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_product_warehouse
+            baseTableName: product
+            baseColumnNames: warehouse_id
+            referencedTableName: warehouse
+            referencedColumnNames: id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_review_users
+            baseTableName: review
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_review_order
+            baseTableName: review
+            baseColumnNames: order_id
+            referencedTableName: order
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_address_users
+            baseTableName: address
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_order_item_product
+            baseTableName: order_item
+            baseColumnNames: product_id
+            referencedTableName: product
+            referencedColumnNames: id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_order_item_order
+            baseTableName: order_item
+            baseColumnNames: order_id
+            referencedTableName: order
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: CASCADE

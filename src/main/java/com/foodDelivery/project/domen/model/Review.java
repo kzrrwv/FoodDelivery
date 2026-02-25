@@ -18,13 +18,11 @@ public class Review {
 
     @OneToOne
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
-    private Order order;
-    private int order_id;
+    private Order order_id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
-    private int user_id;
+    private User user_id;
 
     public Review() {
 
@@ -60,21 +58,5 @@ public class Review {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public int getOrder_id() {
-        return order_id;
-    }
-
-    public void setOrder_id(int order_id) {
-        this.order_id = order_id;
-    }
-
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
     }
 }

@@ -2,7 +2,6 @@ spring:
   application:
     name: project
   liquibase:
-    enabled: false \\убрать когда допишу ключи
     change-log: classpath:db/changelog/db.changelog-master.xml
     default-schema: public
   datasource:
@@ -11,4 +10,4 @@ spring:
     password: 12345
   jpa:
     hibernate:
-      ddl-auto: update \\поменять на validate
+      ddl-auto: validate
