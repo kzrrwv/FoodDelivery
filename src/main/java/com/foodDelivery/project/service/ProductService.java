@@ -13,5 +13,5 @@ public interface ProductService {
 
     void saveProducts(ProductDTO productDTO);
 
-    List<ProductToRetrieve> findReviewsWithPageable(PageRequest of);
+    List<ProductToRetrieve> findProductsWithPageable(PageRequest of);
 }

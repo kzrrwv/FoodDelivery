@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderToRetrieve> findReviewsWithPageable(PageRequest of) {
+    public List<OrderToRetrieve> findOrdersWithPageable(PageRequest of) {
         Page<Order> all = repository.findAll(of);
         List<Order> content = all.getContent();
         return null;

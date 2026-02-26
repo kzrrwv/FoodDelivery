@@ -13,5 +13,5 @@ public interface OrderService {
 
     void saveOrder(OrderDTO orderDTO);
 
-    List<OrderToRetrieve> findReviewsWithPageable(PageRequest of);
+    List<OrderToRetrieve> findOrdersWithPageable(PageRequest of);
 }

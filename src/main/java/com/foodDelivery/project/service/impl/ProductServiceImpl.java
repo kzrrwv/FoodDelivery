@@ -63,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductToRetrieve> findReviewsWithPageable(PageRequest of) {
+    public List<ProductToRetrieve> findProductsWithPageable(PageRequest of) {
         Page<Product> all = repository.findAll(of);
         List<Product> content = all.getContent();
         return null;
