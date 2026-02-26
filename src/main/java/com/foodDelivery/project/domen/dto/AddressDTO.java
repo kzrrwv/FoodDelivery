@@ -1,16 +1,33 @@
 package com.foodDelivery.project.domen.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class AddressDTO {
 
-    private String city;
+        @NotBlank
+        @Size(min = 2, max = 100)
+        private String city;
 
-    private String street;
+        @NotBlank
+        @Size(min = 2, max = 150)
+        private String street;
 
-    private String building;
+        @NotBlank
+        @Size(max = 20)
+        private String building;
 
-    private int apartment;
+        @Min(value = 1)
+        @Max(value = 1000)
+        private int apartment;
 
-    private int entrance;
+        @Min(value = 1)
+        @Max(value = 100)
+        private int entrance;
 
-    private int floor;
+        @Min(value = 1)
+        @Max(value = 200)
+        private int floor;
 }

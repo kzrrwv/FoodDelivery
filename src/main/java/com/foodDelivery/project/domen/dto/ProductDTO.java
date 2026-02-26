@@ -1,11 +1,15 @@
 package com.foodDelivery.project.domen.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
 public class ProductDTO {
 
+    @NotBlank
     private String name;
 
+    @NotBlank
+    @Positive
     private int price;
 
     @Positive

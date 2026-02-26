@@ -3,6 +3,7 @@ package com.foodDelivery.project.controller;
 import com.foodDelivery.project.domen.dto.OrderDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addOrder(@RequestBody OrderDTO orderDTO){
+    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDTO orderDTO){
         orderService.saveOrder(orderDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

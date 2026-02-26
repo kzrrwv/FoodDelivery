@@ -3,6 +3,7 @@ package com.foodDelivery.project.controller;
 import com.foodDelivery.project.domen.dto.ProductDTO;
 import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import com.foodDelivery.project.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addProduct(@RequestBody ProductDTO productDTO){
+    public ResponseEntity<Void> addProduct(@RequestBody @Valid ProductDTO productDTO){
         productService.saveProducts(productDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
