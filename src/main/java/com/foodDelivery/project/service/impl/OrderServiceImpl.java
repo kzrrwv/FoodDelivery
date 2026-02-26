@@ -9,6 +9,8 @@ import com.foodDelivery.project.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +66,12 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentMethod(orderDTO.getPaymentMethod());
         repository.save(order);
         log.info("Заказ успешно добавлен.");
+    }
+
+    @Override
+    public List<OrderToRetrieve> findReviewsWithPageable(PageRequest of) {
+        Page<Order> all = repository.findAll(of);
+        List<Order> content = all.getContent();
+        return null;
     }
 }

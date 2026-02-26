@@ -9,6 +9,8 @@ import com.foodDelivery.project.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +60,12 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productDTO.getPrice());
         repository.save(product);
         log.info("Продукт успешно добавлен.");
+    }
+
+    @Override
+    public List<ProductToRetrieve> findReviewsWithPageable(PageRequest of) {
+        Page<Product> all = repository.findAll(of);
+        List<Product> content = all.getContent();
+        return null;
     }
 }
