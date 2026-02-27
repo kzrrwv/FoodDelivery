@@ -1,5 +1,5 @@
-databaseChangelog:
-  - changeset:
+databaseChangeLog:
+  - changeSet:
       id: 1
       author: Christina
       changes:
@@ -17,7 +17,7 @@ databaseChangelog:
                   name: price
                   type: INT
                   constraints:
-                  nullable: false
+                    nullable: false
               - column:
                   name: order_id
                   type: INT

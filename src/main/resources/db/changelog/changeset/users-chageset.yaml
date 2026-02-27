@@ -1,5 +1,5 @@
-databaseChangelog:
-  - changeset:
+databaseChangeLog:
+  - changeSet:
       id: 1
       author: Christina
       changes:
@@ -9,33 +9,33 @@ databaseChangelog:
               - column:
                   name: id
                   type: bigint
-                  constrains:
+                  constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: email
                   type: varchar(20)
-                  constrains:
+                  constraints:
                     nullable: false
               - column:
                   name: password
                   type: varchar(255)
-                  constrains:
+                  constraints:
                     nullable: false
               - column:
                   name: phone_number
                   type: varchar(20)
-                  constrains:
+                  constraints:
                     nullable: false
               - column:
                   name: role
                   type: varchar(20)
-                  constrains:
+                  constraints:
                     nullable: false
               - column:
                   name: username
                   type: varchar(20)
-                  constrains:
+                  constraints:
                     nullable: false
 
 
