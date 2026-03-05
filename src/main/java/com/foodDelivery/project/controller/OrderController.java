@@ -2,9 +2,11 @@ package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
+import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,9 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderToRetrieve>> getOrders(){
-        return ResponseEntity.ok(orderService.getOrders());
+    public ResponseEntity<List<OrderToRetrieve>> getOrders(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
+        orderService.findOrdersWithPageable(PageRequest.of(page, size));
+        return null;
     }
 
     @GetMapping("/{id}")
