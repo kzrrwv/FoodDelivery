@@ -11,7 +11,11 @@ public interface ProductService {
 
     List<ProductToRetrieve> getProducts();
 
-    void saveProducts(ProductDTO productDTO);
+    void createProduct(ProductDTO productDTO);
 
     List<ProductToRetrieve> findProductsWithPageable(PageRequest of);
+
+    ProductToRetrieve updateProduct(int id, ProductToRetrieve productToRetrieve);
+
+    void deleteProduct(int id);
 }

@@ -12,7 +12,7 @@ public class Warehouse {
     @Id
     private int id;
 
-    @OneToMany(mappedBy = "warehouse")
+    @OneToMany(mappedBy = "warehouse_id")
     private List<Product> products;
 
     public Warehouse() {

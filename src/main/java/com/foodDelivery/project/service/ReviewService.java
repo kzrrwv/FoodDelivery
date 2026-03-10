@@ -12,5 +12,9 @@ public interface ReviewService {
 
     List<ReviewToRetrieve> getReviews();
 
-    public void saveReviews(ReviewDTO reviewDTO);
+    public void createReview(ReviewDTO reviewDTO);
+
+    ReviewToRetrieve updateReview(int id, ReviewToRetrieve reviewToRetrieve);
+
+    void delete(int id);
 }

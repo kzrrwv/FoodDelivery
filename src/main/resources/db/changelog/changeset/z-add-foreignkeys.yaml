@@ -23,7 +23,7 @@ databaseChangeLog:
               constraintName: fk_orders_courier
               baseTableName: orders
               baseColumnNames: courier_id
-              referencedTableName: courier
+              referencedTableName: users
               referencedColumnNames: id
               onDelete: SET NULL
               onUpdate: RESTRICT
@@ -55,7 +55,7 @@ databaseChangeLog:
             constraintName: fk_review_order
             baseTableName: review
             baseColumnNames: order_id
-            referencedTableName: order
+            referencedTableName: orders
             referencedColumnNames: id
             onDelete: CASCADE
             onUpdate: CASCADE
@@ -79,7 +79,7 @@ databaseChangeLog:
             constraintName: fk_order_item_order
             baseTableName: order_item
             baseColumnNames: order_id
-            referencedTableName: order
+            referencedTableName: orders
             referencedColumnNames: id
             onDelete: CASCADE
             onUpdate: CASCADE

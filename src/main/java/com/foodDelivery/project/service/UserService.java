@@ -10,5 +10,10 @@ public interface UserService {
 
     List<UserToRetrieve> getUsers();
 
-    void saveUsers(UserDTO userDTO);
+    void createUser(UserDTO userDTO);
+
+    UserToRetrieve updateUser(int id, UserToRetrieve userToRetrieve);
+
+    void deleteUser(int id);
+
 }

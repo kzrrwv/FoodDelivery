@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    container_name: foodDeliveryPostgres
+    environment:
+      - 'POSTGRES_DB=postgres'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=12345'
+    ports:
+      - '5432:5432'
+  project:
+    build:
+      dockerfile: Dockerfile
+    container_name: foodDelivery
+    depends_on:
+      - postgres

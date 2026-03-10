@@ -4,7 +4,6 @@ import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
-import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.UserService;
 import org.slf4j.Logger;
@@ -27,27 +26,7 @@ public class UserServiceImpl implements UserService {
         this.repository = repository;
     }
 
-    public List<UserToRetrieve> getUsers(){
-        List<User> all = repository.findAll();
-
-        if (all.isEmpty()) {
-            log.debug("База данных пустая");
-            throw new BusinessException(
-                    "Пользователи не найдены",
-                    HttpStatus.NOT_FOUND
-            );
-        }
-        List<UserToRetrieve> userToRetrieves = new ArrayList<>();
-        for(User user : all){
-            UserToRetrieve userToRetrieve = new UserToRetrieve();
-            userToRetrieve.setUserName(user.getUsername());
-            userToRetrieve.setEmail(user.getEmail());
-            userToRetrieves.add(userToRetrieve);
-        }
-        return userToRetrieves;
-    }
-
-    public void saveUsers(UserDTO userDTO){
+    public void createUser(UserDTO userDTO){
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -60,5 +39,27 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.CUSTOMER);
         }
         repository.save(user);
+    }
+
+    public List<UserToRetrieve> getUsers(){
+        List<User> all = repository.findAll();
+        List<UserToRetrieve> userToRetrieves = new ArrayList<>();
+        for(User user : all){
+            UserToRetrieve userToRetrieve = new UserToRetrieve();
+            userToRetrieve.setUserName(user.getUsername());
+            userToRetrieve.setEmail(user.getEmail());
+            userToRetrieves.add(userToRetrieve);
+        }
+        return userToRetrieves;
+    }
+
+    @Override
+    public UserToRetrieve updateUser(int id, UserToRetrieve userToRetrieve) {
+        return null;
+    }
+
+    @Override
+    public void deleteUser(int id) {
+
     }
 }

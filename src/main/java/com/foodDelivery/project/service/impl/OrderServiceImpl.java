@@ -30,17 +30,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void createOrder(OrderDTO orderDTO){
+        Order order = new Order();
+        order.setTotalAmount(orderDTO.getTotalAmount());
+        order.setDeliveryFee(orderDTO.getDeliveryFee());
+        order.setStatus(orderDTO.getStatus());
+        order.setComment(orderDTO.getComment());
+        order.setCreatedAt(orderDTO.getCreatedAt());
+        order.setDeliveredAt(orderDTO.getDeliveredAt());
+        order.setPaymentMethod(orderDTO.getPaymentMethod());
+        repository.save(order);
+        log.info("Заказ успешно добавлен.");
+    }
+
+    @Override
     public List<OrderToRetrieve> getOrders(){
         List<Order> all = repository.findAll();
-
-        if (all.isEmpty()) {
-            log.debug("База данных пустая!");
-            throw new BusinessException(
-                    "Список заказов пуст",
-                    HttpStatus.NOT_FOUND
-            );
-        }
-
         List<OrderToRetrieve> orderToRetrieves = new ArrayList<>();
 
         for(Order order : all){
@@ -55,23 +60,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void saveOrder(OrderDTO orderDTO){
-        Order order = new Order();
-        order.setTotalAmount(orderDTO.getTotalAmount());
-        order.setDeliveryFee(orderDTO.getDeliveryFee());
-        order.setStatus(orderDTO.getStatus());
-        order.setComment(orderDTO.getComment());
-        order.setCreatedAt(orderDTO.getCreatedAt());
-        order.setDeliveredAt(orderDTO.getDeliveredAt());
-        order.setPaymentMethod(orderDTO.getPaymentMethod());
-        repository.save(order);
-        log.info("Заказ успешно добавлен.");
-    }
-
-    @Override
     public List<OrderToRetrieve> findOrdersWithPageable(PageRequest of) {
         Page<Order> all = repository.findAll(of);
         List<Order> content = all.getContent();
         return null;
+    }
+
+    @Override
+    public OrderToRetrieve updateOrder(int id, OrderToRetrieve orderToRetrieve) {
+        return null;
+    }
+
+    @Override
+    public void deleteOrder(int id) {
+
     }
 }

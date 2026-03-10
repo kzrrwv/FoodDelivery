@@ -33,7 +33,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Void> addUser(@RequestBody @Valid UserDTO userDTO){
-        service.saveUsers(userDTO);
+        service.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

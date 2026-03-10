@@ -30,6 +30,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void createProduct(ProductDTO productDTO){
+        Product product = new Product();
+        product.setAmount(productDTO.getAmount());
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        repository.save(product);
+        log.info("Продукт успешно добавлен.");
+    }
+
+    @Override
     public List<ProductToRetrieve> getProducts(){
         List<Product> all = repository.findAll();
 
@@ -53,19 +63,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void saveProducts(ProductDTO productDTO){
-        Product product = new Product();
-        product.setAmount(productDTO.getAmount());
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice());
-        repository.save(product);
-        log.info("Продукт успешно добавлен.");
-    }
-
-    @Override
     public List<ProductToRetrieve> findProductsWithPageable(PageRequest of) {
         Page<Product> all = repository.findAll(of);
         List<Product> content = all.getContent();
         return null;
+    }
+
+    @Override
+    public ProductToRetrieve updateProduct(int id, ProductToRetrieve productToRetrieve) {
+        return null;
+    }
+
+    @Override
+    public void deleteProduct(int id) {
+
     }
 }

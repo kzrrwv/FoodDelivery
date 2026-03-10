@@ -29,6 +29,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public void createReview(ReviewDTO reviewDTO){
+        Review review = new Review();
+        review.setRating(reviewDTO.getRating());
+        review.setComment(reviewDTO.getComment());
+        repository.save(review);
+        log.info("Отзыв успешно добавлен.");
+    }
+
+    @Override
     public List<ReviewToRetrieve> getReviews(){
         List<Review> all = repository.findAll();
 
@@ -52,18 +61,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void saveReviews(ReviewDTO reviewDTO){
-        Review review = new Review();
-        review.setRating(reviewDTO.getRating());
-        review.setComment(reviewDTO.getComment());
-        repository.save(review);
-        log.info("Отзыв успешно добавлен.");
-    }
-
-    @Override
     public List<ReviewToRetrieve> findReviewsWithPageble(PageRequest of) {
         Page<Review> all = repository.findAll(of);
         List<Review> content = all.getContent();
         return null;
+    }
+
+    @Override
+    public ReviewToRetrieve updateReview(int id, ReviewToRetrieve reviewToRetrieve) {
+        return null;
+    }
+
+    @Override
+    public void delete(int id) {
+
     }
 }
