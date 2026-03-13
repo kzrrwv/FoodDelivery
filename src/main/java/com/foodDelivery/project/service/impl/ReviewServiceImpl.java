@@ -1,6 +1,7 @@
 package com.foodDelivery.project.service.impl;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
+import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
@@ -41,14 +42,6 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewToRetrieve> getReviews(){
         List<Review> all = repository.findAll();
 
-        if (all.isEmpty()) {
-            log.debug("База данных пустая!");
-            throw new BusinessException(
-                    "Отзывы отсутствуют",
-                    HttpStatus.NOT_FOUND
-            );
-        }
-
         List<ReviewToRetrieve> reviewToRetrieves = new ArrayList<>();
 
         for(Review review : all){
@@ -68,7 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewToRetrieve updateReview(int id, ReviewToRetrieve reviewToRetrieve) {
+    public ReviewDTO updateReview(int id, ReviewDTO reviewDTO) {
         return null;
     }
 

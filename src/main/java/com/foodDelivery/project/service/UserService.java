@@ -12,7 +12,7 @@ public interface UserService {
 
     void createUser(UserDTO userDTO);
 
-    UserToRetrieve updateUser(int id, UserToRetrieve userToRetrieve);
+    UserDTO updateUser(int id, UserDTO userDTO);
 
     void deleteUser(int id);
 

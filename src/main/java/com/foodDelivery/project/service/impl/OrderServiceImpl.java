@@ -67,12 +67,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderToRetrieve updateOrder(int id, OrderToRetrieve orderToRetrieve) {
+    public OrderDTO updateOrder(int id, OrderDTO orderDTO) {
         return null;
     }
 
     @Override
     public void deleteOrder(int id) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));
 
+        repository.delete(order);
+
+        log.info("Заказ с id {} успешно удален.", id);
     }
 }

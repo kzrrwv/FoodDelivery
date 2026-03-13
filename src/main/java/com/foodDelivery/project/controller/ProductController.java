@@ -37,7 +37,13 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Void> addProduct(@RequestBody @Valid ProductDTO productDTO){
-        productService.saveProducts(productDTO);
+        productService.createProduct(productDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id){
+        productService.deleteProduct(id);
+        return null;
     }
 }

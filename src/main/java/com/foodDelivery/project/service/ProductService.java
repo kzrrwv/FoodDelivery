@@ -15,7 +15,7 @@ public interface ProductService {
 
     List<ProductToRetrieve> findProductsWithPageable(PageRequest of);
 
-    ProductToRetrieve updateProduct(int id, ProductToRetrieve productToRetrieve);
+    ProductDTO updateProduct(int id, ProductDTO productDTO);
 
     void deleteProduct(int id);
 }
