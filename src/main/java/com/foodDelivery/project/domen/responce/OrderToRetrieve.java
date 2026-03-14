@@ -27,4 +27,20 @@ public class OrderToRetrieve {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public int getDeliveryFee() {
+        return deliveryFee;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public String getComment() {
+        return comment;
+    }
 }

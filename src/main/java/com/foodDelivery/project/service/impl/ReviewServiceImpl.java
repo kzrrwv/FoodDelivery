@@ -2,6 +2,7 @@ package com.foodDelivery.project.service.impl;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.dto.UserDTO;
+import com.foodDelivery.project.domen.model.Product;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
@@ -67,6 +68,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void delete(int id) {
-
+        Review review = repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Отзыв не найден!", HttpStatus.NOT_FOUND));
+        repository.delete(review);
+        log.info("Отзыв с id {} успешно удален.", id);
     }
 }

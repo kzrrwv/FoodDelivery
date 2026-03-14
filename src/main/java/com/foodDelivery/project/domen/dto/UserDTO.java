@@ -45,4 +45,8 @@ public class UserDTO {
     public String getRole() {
         return role;
     }
+
+    //public User fromUserDTO(UserDTO user) {
+
+    //}
 }
