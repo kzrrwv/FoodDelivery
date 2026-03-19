@@ -56,7 +56,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        return null;
+        User user = repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Пользователь не найден!", HttpStatus.NOT_FOUND));
+
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        try{
+            user.setRole(UserRole.valueOf(userDTO.getRole()));
+        } catch(IllegalArgumentException e){
+            log.debug("Неправильный формат роли!");
+            user.setRole(UserRole.CUSTOMER);
+        }
+
+        User saved = repository.save(user);
+        UserDTO dto = new UserDTO();
+        dto.setEmail(saved.getEmail());
+        dto.setUsername(saved.getUsername());
+        dto.setPassword(saved.getPassword());
+        dto.setPhoneNumber(saved.getPhoneNumber());
+        dto.setRole(saved.getRole().name());
+
+        return dto;
     }
 
     @Override

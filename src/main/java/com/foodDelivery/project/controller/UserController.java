@@ -21,6 +21,12 @@ public class UserController {
         this.service = service;
     }
 
+    @PostMapping
+    public ResponseEntity<Void> addUser(@RequestBody @Valid UserDTO userDTO){
+        service.createUser(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping
     public ResponseEntity<List<UserToRetrieve>> getUsers(){
         return ResponseEntity.ok(service.getUsers());
@@ -31,9 +37,15 @@ public class UserController {
         return ResponseEntity.ok(new UserDTO());
     }
 
-    @PostMapping
-    public ResponseEntity<Void> addUser(@RequestBody @Valid UserDTO userDTO){
-        service.createUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO){
+        UserDTO updated = service.updateUser(id, userDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        service.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

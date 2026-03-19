@@ -24,6 +24,12 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @PostMapping
+    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDTO orderDTO){
+        orderService.createOrder(orderDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping
     public ResponseEntity<List<OrderToRetrieve>> getOrders(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
         orderService.findOrdersWithPageable(PageRequest.of(page, size));
@@ -33,12 +39,6 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id){
         return ResponseEntity.ok(new OrderDTO());
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderDTO orderDTO){
-        orderService.createOrder(orderDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

@@ -63,7 +63,24 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO updateReview(Long id, ReviewDTO reviewDTO) {
-        return null;
+        Review review = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Отзыв не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        review.setComment(reviewDTO.getComment());
+        review.setRating(reviewDTO.getRating());
+        review.setCreatedAt(reviewDTO.getCreatedAt());
+
+        Review saved = repository.save(review);
+
+        ReviewDTO dto = new ReviewDTO();
+        dto.setComment(saved.getComment());
+        dto.setRating(saved.getRating());
+        dto.setCreatedAt(saved.getCreatedAt());
+
+        return dto;
     }
 
     @Override
