@@ -15,7 +15,7 @@ public interface OrderService {
 
     List<OrderToRetrieve> findOrdersWithPageable(PageRequest of);
 
-    OrderDTO updateOrder(int id, OrderDTO orderDTO);
+    OrderDTO updateOrder(Long id, OrderDTO orderDTO);
 
-    void deleteOrder(int id);
+    void deleteOrder(Long id);
 }

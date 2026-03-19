@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 @Entity
 public class OrderItem {
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private int price;
 
@@ -21,12 +22,28 @@ public class OrderItem {
 
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Order getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(Order order_id) {
+        this.order_id = order_id;
+    }
+
+    public Product getProduct_id() {
+        return product_id;
+    }
+
+    public void setProduct_id(Product product_id) {
+        this.product_id = product_id;
     }
 
     public int getPrice() {

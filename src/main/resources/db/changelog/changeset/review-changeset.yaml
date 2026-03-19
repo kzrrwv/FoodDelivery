@@ -8,14 +8,14 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: INT
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: rating
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false
               - column:
@@ -27,12 +27,12 @@ databaseChangeLog:
                   defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: order_id
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false
                     unique: true
               - column:
                   name: user_id
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false

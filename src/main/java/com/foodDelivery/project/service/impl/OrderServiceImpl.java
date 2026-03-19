@@ -67,12 +67,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO updateOrder(int id, OrderDTO orderDTO) {
+    public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
         return null;
     }
 
     @Override
-    public void deleteOrder(int id) {
+    public void deleteOrder(Long id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));
 

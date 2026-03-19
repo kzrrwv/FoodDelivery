@@ -8,7 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: INT
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     primaryKey: true
@@ -20,16 +20,16 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: price
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false
               - column:
                   name: amount
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false
               - column:
                   name: warehouse_id
-                  type: INT
+                  type: bigint
                   constraints:
                     nullable: false

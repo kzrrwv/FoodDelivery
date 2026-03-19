@@ -55,12 +55,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(int id, UserDTO userDTO) {
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
         return null;
     }
 
     @Override
-    public void deleteUser(int id) {
+    public void deleteUser(Long id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Пользователь не найден!", HttpStatus.NOT_FOUND));
         repository.delete(user);

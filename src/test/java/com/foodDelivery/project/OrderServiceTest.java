@@ -7,14 +7,12 @@ import com.foodDelivery.project.domen.model.enums.PaymentMethod;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.OrderRepository;
-import com.foodDelivery.project.service.OrderService;
+import com.foodDelivery.project.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +26,7 @@ public class OrderServiceTest {
     private OrderRepository repository;
 
     @InjectMocks
-    private OrderService service;
+    private OrderServiceImpl service;
 
     @BeforeEach
     void setUp() {
@@ -75,11 +73,11 @@ public class OrderServiceTest {
     void deleteOrder_shouldDelete() {
 
         Order order = new Order();
-        order.setId(1);
+        order.setId(1L);
 
-        when(repository.findById(1)).thenReturn(Optional.of(order));
+        when(repository.findById(1L)).thenReturn(Optional.of(order));
 
-        service.deleteOrder(1);
+        service.deleteOrder(1L);
 
         verify(repository).delete(order);
     }
@@ -87,11 +85,11 @@ public class OrderServiceTest {
     @Test
     void deleteOrder_shouldThrowException() {
 
-        when(repository.findById(1)).thenReturn(Optional.empty());
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(
                 BusinessException.class,
-                () -> service.deleteOrder(1)
+                () -> service.deleteOrder(1L)
         );
     }
 }

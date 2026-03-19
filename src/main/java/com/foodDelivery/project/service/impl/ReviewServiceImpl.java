@@ -62,12 +62,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDTO updateReview(int id, ReviewDTO reviewDTO) {
+    public ReviewDTO updateReview(Long id, ReviewDTO reviewDTO) {
         return null;
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         Review review = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Отзыв не найден!", HttpStatus.NOT_FOUND));
         repository.delete(review);

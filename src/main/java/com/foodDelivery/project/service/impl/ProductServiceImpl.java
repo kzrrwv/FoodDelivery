@@ -70,12 +70,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO updateProduct(int id, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         return null;
     }
 
     @Override
-    public void deleteProduct(int id) {
+    public void deleteProduct(Long id) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Продукт не найден!", HttpStatus.NOT_FOUND));
         repository.delete(product);

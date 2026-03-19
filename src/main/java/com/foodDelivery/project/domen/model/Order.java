@@ -12,7 +12,8 @@ import java.util.List;
 public class Order {
 
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private int totalAmount;
 
@@ -54,12 +55,44 @@ public class Order {
 
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Address getAddress_id() {
+        return address_id;
+    }
+
+    public void setAddress_id(Address address_id) {
+        this.address_id = address_id;
+    }
+
+    public User getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(User user_id) {
+        this.user_id = user_id;
+    }
+
+    public Review getReview_id() {
+        return review_id;
+    }
+
+    public void setReview_id(Review review_id) {
+        this.review_id = review_id;
+    }
+
+    public User getCourier_id() {
+        return courier_id;
+    }
+
+    public void setCourier_id(User courier_id) {
+        this.courier_id = courier_id;
     }
 
     public int getTotalAmount() {

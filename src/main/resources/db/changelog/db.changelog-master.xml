@@ -3,5 +3,14 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+                    <changeSet id="1" author="kristina">
+                        <createSequence sequenceName="users_seq"
+                                        startValue="1"
+                                        incrementBy="1"
+                        ></createSequence>
+                        <rollback>
+                            <dropSequence sequenceName="users_seq"/>
+                        </rollback>
+                    </changeSet>
                     <includeAll path="db/changelog/changeset"/>
 </databaseChangeLog>

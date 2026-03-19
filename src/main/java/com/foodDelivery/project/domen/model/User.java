@@ -2,14 +2,16 @@ package com.foodDelivery.project.domen.model;
 
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(allocationSize = 1, name = "users_seq", sequenceName = "users_seq")
+    private Long id;
 
     private String username;
 
@@ -26,11 +28,11 @@ public class User {
 
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

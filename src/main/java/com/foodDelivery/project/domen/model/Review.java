@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 public class Review {
 
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private int rating;
 
@@ -28,12 +29,28 @@ public class Review {
 
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Order getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(Order order_id) {
+        this.order_id = order_id;
+    }
+
+    public User getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(User user_id) {
+        this.user_id = user_id;
     }
 
     public int getRating() {

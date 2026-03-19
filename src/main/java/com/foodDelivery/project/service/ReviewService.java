@@ -14,7 +14,7 @@ public interface ReviewService {
 
     public void createReview(ReviewDTO reviewDTO);
 
-    ReviewDTO updateReview(int id, ReviewDTO reviewDTO);
+    ReviewDTO updateReview(Long id, ReviewDTO reviewDTO);
 
-    void delete(int id);
+    void delete(Long id);
 }

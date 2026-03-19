@@ -1,16 +1,28 @@
 services:
   postgres:
-    image: 'postgres:latest'
-    container_name: foodDeliveryPostgres
+    image: 'postgres:16'
+    container_name: 'foodDeliveryPostgres'
     environment:
       - 'POSTGRES_DB=postgres'
       - 'POSTGRES_USER=postgres'
       - 'POSTGRES_PASSWORD=12345'
     ports:
       - '5432:5432'
+    networks:
+      - food-network
   project:
-    build:
-      dockerfile: Dockerfile
+    build: .
     container_name: foodDelivery
+    ports:
+      - '8080:8080'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://foodDeliveryPostgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
       - postgres
+    networks:
+      - food-network
+networks:
+  food-network:
+    driver: bridge
