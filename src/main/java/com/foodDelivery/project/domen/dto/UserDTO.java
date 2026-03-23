@@ -1,12 +1,18 @@
 package com.foodDelivery.project.domen.dto;
 
+import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.domen.model.enums.UserRole;
+import com.foodDelivery.project.service.impl.UserServiceImpl;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserDTO {
+
+    private static final Logger log = LoggerFactory.getLogger(UserDTO.class);
 
     @NotBlank
     @Size(min = 5, max = 15, message = "Username должен быть от 5 до 15 символов!")
@@ -66,7 +72,18 @@ public class UserDTO {
         this.username = username;
     }
 
-    //public User fromUserDTO(UserDTO user) {
-
-    //}
+//    public static User fromUserDTO(UserDTO userDTO) {
+//        User user = new User();
+//        user.setUsername(userDTO.getUsername());
+//        user.setEmail(userDTO.getEmail());
+//        user.setPassword(userDTO.getPassword());
+//        user.setPhoneNumber(userDTO.getPhoneNumber());
+//        try{
+//            user.setRole(UserRole.valueOf(userDTO.getRole()));
+//        } catch(IllegalArgumentException e){
+//            log.debug("Неправильный формат роли, по умолчанию присваеваем customer.");
+//            user.setRole(UserRole.CUSTOMER);
+//        }
+//        return user;
+//    }
 }
