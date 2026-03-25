@@ -71,7 +71,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
-        return null;
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Продукт не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        product.setPrice(productDTO.getPrice());
+        product.setName(productDTO.getName());
+        product.setAmount(productDTO.getAmount());
+
+        Product saved = repository.save(product);
+
+        ProductDTO dto = new ProductDTO();
+        dto.setPrice(saved.getPrice());
+        dto.setName(saved.getName());
+        dto.setAmount(saved.getAmount());
+        return dto;
     }
 
     @Override

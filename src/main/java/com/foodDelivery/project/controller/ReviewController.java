@@ -1,6 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
+import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.ReviewService;
@@ -42,6 +43,12 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
+    public ResponseEntity<ReviewDTO> updateReviewPagination(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO){
+        ReviewDTO updated = reviewService.updateReview(id, reviewDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/update/{id}")
     public ResponseEntity<ReviewDTO> updateReview(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO){
         ReviewDTO updated = reviewService.updateReview(id, reviewDTO);
         return ResponseEntity.ok(updated);

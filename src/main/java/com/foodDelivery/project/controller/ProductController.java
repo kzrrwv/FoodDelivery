@@ -1,6 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.ProductDTO;
+import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.ProductService;
@@ -41,7 +42,11 @@ public class ProductController {
         return ResponseEntity.ok(new ProductDTO());
     }
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO){
+        ProductDTO updated = productService.updateProduct(id, productDTO);
+        return ResponseEntity.ok(updated);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id){

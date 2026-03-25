@@ -1,6 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
+import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.OrderService;
@@ -41,4 +42,15 @@ public class OrderController {
         return ResponseEntity.ok(new OrderDTO());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO){
+        OrderDTO updated = orderService.updateOrder(id, orderDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id){
+        orderService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -68,7 +68,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
-        return null;
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Заказ не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        order.setTotalAmount(orderDTO.getTotalAmount());
+        order.setDeliveryFee(orderDTO.getDeliveryFee());
+        order.setStatus(orderDTO.getStatus());
+        order.setComment(order.getComment());
+
+        Order saved = repository.save(order);
+
+        OrderDTO dto = new OrderDTO();
+        dto.setTotalAmount(saved.getTotalAmount());
+        dto.setDeliveryFee(saved.getDeliveryFee());
+        dto.setStatus(saved.getStatus());
+        dto.setComment(saved.getComment());
+
+        return dto;
     }
 
     @Override

@@ -32,4 +32,20 @@ public class ProductDTO {
     public int getWarehouse_id() {
         return warehouse_id;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setWarehouse_id(int warehouse_id) {
+        this.warehouse_id = warehouse_id;
+    }
 }
