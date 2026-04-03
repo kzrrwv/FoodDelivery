@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,8 +52,10 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean isTokenValid(){
-        return true;
+    //дописать
+    public boolean isTokenValid(String token, UserDetails userDetails){
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     public Date extractExpiration(String token){
@@ -72,6 +73,6 @@ public class JwtService {
     }
 
     public String extractUsername(String token){
-        return null;
+        return extractClaim(token, Claims::getSubject);
     }
 }

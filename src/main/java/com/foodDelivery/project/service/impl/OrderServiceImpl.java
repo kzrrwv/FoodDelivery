@@ -61,9 +61,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderToRetrieve> findOrdersWithPageable(PageRequest of) {
-        Page<Order> all = repository.findAll(of);
-        List<Order> content = all.getContent();
-        return null;
+        Page<Order> page = repository.findAll(of);
+
+        List<OrderToRetrieve> result = new ArrayList<>();
+
+        for (Order order : page.getContent()) {
+            OrderToRetrieve dto = new OrderToRetrieve();
+            dto.setComment(order.getComment());
+            dto.setStatus(order.getStatus());
+            dto.setDeliveryFee(order.getDeliveryFee());
+            dto.setTotalAmount(order.getTotalAmount());
+            result.add(dto);
+        }
+
+        return result;
     }
 
     @Override

@@ -65,8 +65,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductToRetrieve> findProductsWithPageable(PageRequest of) {
         Page<Product> all = repository.findAll(of);
-        List<Product> content = all.getContent();
-        return null;
+        List<ProductToRetrieve> result = new ArrayList<>();
+
+        for(Product product : all.getContent()){
+            ProductToRetrieve dto = new ProductToRetrieve();
+            dto.setPrice(product.getPrice());
+            dto.setName(product.getName());
+            dto.setAmount(product.getAmount());
+            result.add(dto);
+        }
+        return result;
     }
 
     @Override
