@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-
     @Query(value = "SELECT * FROM orders WHERE user_id = :id ORDER BY createdAt DESC", nativeQuery = true)
     List<Order> getOrdersByUserIdOrderByCreatedAtDesc(@Param("id") Long id);
 }

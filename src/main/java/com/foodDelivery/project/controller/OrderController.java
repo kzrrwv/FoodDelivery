@@ -33,8 +33,10 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<OrderToRetrieve>> getOrders(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        orderService.findOrdersWithPageable(PageRequest.of(page, size));
-        return null;
+        List<OrderToRetrieve> orders =
+                orderService.findOrdersWithPageable(PageRequest.of(page, size));
+
+        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")

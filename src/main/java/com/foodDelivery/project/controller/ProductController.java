@@ -33,8 +33,9 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductToRetrieve>> getProducts(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        productService.findProductsWithPageable(PageRequest.of(page, size));
-        return null;
+        List<ProductToRetrieve> products =
+                productService.findProductsWithPageable(PageRequest.of(page, size));
+        return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
