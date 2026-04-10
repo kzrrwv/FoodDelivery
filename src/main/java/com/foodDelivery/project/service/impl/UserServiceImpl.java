@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +29,17 @@ public class UserServiceImpl implements UserService {
         this.repository = repository;
     }
 
+    public UserDetailsService userDetailsService(){
+        return username -> {
+            User user = repository.findUserByUsername(username).get();
+                    return new org.springframework.security.core.userdetails.User(
+                            user.getUsername(),
+                            user.getPassword(),
+                            List.of(new SimpleGrantedAuthority(user.getRole().name()))
+                    );
+        };
+    }
+
     public void createUser(UserDTO userDTO){
         User user = new User();
         user.setUsername(userDTO.getUsername());
@@ -37,7 +50,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.valueOf(userDTO.getRole()));
         } catch(IllegalArgumentException e){
             log.debug("Неправильный формат роли, по умолчанию присваеваем customer.");
-            user.setRole(UserRole.CUSTOMER);
+            user.setRole(UserRole.ROLE_USER);
         }
         repository.save(user);
     }
@@ -67,7 +80,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.valueOf(userDTO.getRole()));
         } catch(IllegalArgumentException e){
             log.debug("Неправильный формат роли!");
-            user.setRole(UserRole.CUSTOMER);
+            user.setRole(UserRole.ROLE_USER);
         }
 
         User saved = repository.save(user);

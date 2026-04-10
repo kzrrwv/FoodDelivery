@@ -2,7 +2,7 @@ package com.foodDelivery.project.domen.model.enums;
 
 public enum UserRole {
 
-    CUSTOMER,
-    COURIER,
-    ADMIN
+    ROLE_USER,
+    ROLE_COURIER,
+    ROLE_ADMIN
 }

@@ -11,7 +11,7 @@ public class Warehouse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "warehouse_id")
+    @OneToMany(mappedBy = "warehouse_id", fetch = FetchType.LAZY)
     private List<Product> products;
 
     public Warehouse() {

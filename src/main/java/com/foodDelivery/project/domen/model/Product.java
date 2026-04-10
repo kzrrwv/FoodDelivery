@@ -15,7 +15,7 @@ public class Product {
 
     private int amount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id", insertable = false, updatable = false)
     private Warehouse warehouse_id;
 

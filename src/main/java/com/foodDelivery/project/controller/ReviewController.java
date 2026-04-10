@@ -1,8 +1,6 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
-import com.foodDelivery.project.domen.dto.UserDTO;
-import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.ReviewService;
 import jakarta.validation.Valid;
