@@ -19,4 +19,16 @@ public class ProductToRetrieve {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
 }

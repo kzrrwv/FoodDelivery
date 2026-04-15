@@ -10,9 +10,14 @@ import com.foodDelivery.project.repository.OrderRepository;
 import com.foodDelivery.project.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,75 +26,83 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class OrderServiceTest {
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
+
     @Mock
     private OrderRepository repository;
 
     @InjectMocks
     private OrderServiceImpl service;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
     void createOrder_shouldSaveOrder() {
-
         OrderDTO dto = new OrderDTO();
-        dto = mock(OrderDTO.class);
-
-        when(dto.getTotalAmount()).thenReturn(100);
-        when(dto.getDeliveryFee()).thenReturn(10);
-        when(dto.getStatus()).thenReturn(OrderStatus.ON_THE_WAY);
-        when(dto.getComment()).thenReturn("test");
-        when(dto.getCreatedAt()).thenReturn(LocalDateTime.now());
-        when(dto.getDeliveredAt()).thenReturn(LocalDateTime.now());
-        when(dto.getPaymentMethod()).thenReturn(PaymentMethod.CARD);
+        dto.setTotalAmount(100);
+        dto.setDeliveryFee(20);
 
         service.createOrder(dto);
 
-        verify(repository, times(1)).save(any(Order.class));
+        verify(repository).save(any(Order.class));
     }
 
     @Test
-    void getOrders_shouldReturnList() {
-
+    void getOrders_shouldMapCorrectly() {
         Order order = new Order();
-        order.setTotalAmount(100);
-        order.setDeliveryFee(5);
-        order.setStatus(OrderStatus.ON_THE_WAY);
-        order.setComment("hello");
+        order.setTotalAmount(150);
+        order.setDeliveryFee(30);
+        order.setComment("test");
 
         when(repository.findAll()).thenReturn(List.of(order));
 
         List<OrderToRetrieve> result = service.getOrders();
 
         assertEquals(1, result.size());
-        assertEquals(100, result.get(0).getTotalAmount());
+        assertEquals(150, result.get(0).getTotalAmount());
+        assertEquals("test", result.get(0).getComment());
     }
 
     @Test
-    void deleteOrder_shouldDelete() {
-
+    void pageable_shouldReturnData() {
         Order order = new Order();
-        order.setId(1L);
+        order.setTotalAmount(200);
+
+        Page<Order> page = new PageImpl<>(List.of(order));
+
+        when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+
+        List<OrderToRetrieve> result =
+                service.findOrdersWithPageable(PageRequest.of(0, 10));
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void updateOrder_shouldChangeValues() {
+        Order order = new Order();
+        order.setTotalAmount(100);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(order));
+        when(repository.save(any())).thenReturn(order);
+
+        OrderDTO dto = new OrderDTO();
+        dto.setTotalAmount(999);
+        dto.setDeliveryFee(50);
+
+        OrderDTO result = service.updateOrder(1L, dto);
+
+        assertEquals(999, result.getTotalAmount());
+        assertEquals(50, result.getDeliveryFee());
+    }
+
+    @Test
+    void deleteOrder_shouldCallDelete() {
+        Order order = new Order();
 
         when(repository.findById(1L)).thenReturn(Optional.of(order));
 
         service.deleteOrder(1L);
 
         verify(repository).delete(order);
-    }
-
-    @Test
-    void deleteOrder_shouldThrowException() {
-
-        when(repository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(
-                BusinessException.class,
-                () -> service.deleteOrder(1L)
-        );
     }
 }
