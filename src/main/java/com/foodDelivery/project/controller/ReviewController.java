@@ -24,32 +24,32 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addReviews(@RequestBody @Valid ReviewDTO reviewDTO){
+    public ResponseEntity<Void> addReview(@RequestBody @Valid ReviewDTO reviewDTO){
         reviewService.createReview(reviewDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewToRetrieve>> getReviews(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        reviewService.findReviewsWithPageble(PageRequest.of(page, size));
-        return null;
+    public ResponseEntity<List<ReviewToRetrieve>> getReviews(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size){
+
+        return ResponseEntity.ok(
+                reviewService.findReviewsWithPageble(PageRequest.of(page, size))
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReviewDTO> getReviewById(@PathVariable Long id){
-        return ResponseEntity.ok(new ReviewDTO());
+    public ResponseEntity<ReviewToRetrieve> getReviewById(@PathVariable Long id){
+        return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReviewDTO> updateReviewPagination(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO){
-        ReviewDTO updated = reviewService.updateReview(id, reviewDTO);
-        return ResponseEntity.ok(updated);
-    }
+    public ResponseEntity<ReviewDTO> updateReview(
+            @PathVariable Long id,
+            @RequestBody @Valid ReviewDTO reviewDTO){
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ReviewDTO> updateReview(@PathVariable Long id, @RequestBody ReviewDTO reviewDTO){
-        ReviewDTO updated = reviewService.updateReview(id, reviewDTO);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(reviewService.updateReview(id, reviewDTO));
     }
 
     @DeleteMapping("/{id}")

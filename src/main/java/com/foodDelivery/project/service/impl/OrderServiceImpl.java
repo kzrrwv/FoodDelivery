@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public void createOrder(OrderDTO orderDTO){
         Order order = new Order();
         order.setTotalAmount(orderDTO.getTotalAmount());
@@ -44,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    //получить список заказов по пользователю поменять
     public List<OrderToRetrieve> getOrders(){
         List<Order> all = repository.findAll();
         List<OrderToRetrieve> orderToRetrieves = new ArrayList<>();
@@ -60,6 +63,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderToRetrieve getOrderById(Long id) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Заказ не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        OrderToRetrieve dto = new OrderToRetrieve();
+        dto.setComment(order.getComment());
+        dto.setStatus(order.getStatus());
+        dto.setDeliveryFee(order.getDeliveryFee());
+        dto.setTotalAmount(order.getTotalAmount());
+
+        return dto;
+    }
+
+    @Override
+    //переделать заказы по пользователю поиск
     public List<OrderToRetrieve> findOrdersWithPageable(PageRequest of) {
         Page<Order> page = repository.findAll(of);
 
@@ -78,6 +99,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize(value = "hasRole('ROLE_USER')")
+    //сделать проверку является ли заказ пользователя
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
@@ -88,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setDeliveryFee(orderDTO.getDeliveryFee());
         order.setStatus(orderDTO.getStatus());
-        order.setComment(order.getComment());
+        order.setComment(orderDTO.getComment());
 
         Order saved = repository.save(order);
 
@@ -102,6 +125,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')'")
     public void deleteOrder(Long id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));

@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@PreAuthorize(value = "hasRole('ROLE_ADMIN) or hasRole('ROLE_COURIER')")
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository repository;
@@ -63,6 +65,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductToRetrieve getProductById(Long id) {
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Продукт не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        ProductToRetrieve dto = new ProductToRetrieve();
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setAmount(product.getAmount());
+
+        return dto;
+    }
+
+    @Override
     public List<ProductToRetrieve> findProductsWithPageable(PageRequest of) {
         Page<Product> all = repository.findAll(of);
         List<ProductToRetrieve> result = new ArrayList<>();
@@ -103,6 +121,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Продукт не найден!", HttpStatus.NOT_FOUND));
         repository.delete(product);
-        log.info("Заказ с id {} успешно удален.", id);
+        log.info("Продукт с id {} успешно удален.", id);
     }
 }

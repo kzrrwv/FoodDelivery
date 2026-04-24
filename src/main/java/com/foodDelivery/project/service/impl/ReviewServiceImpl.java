@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 public class ReviewServiceImpl implements ReviewService {
 
     private ReviewRepository repository;
@@ -55,10 +57,34 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public ReviewToRetrieve getReviewById(Long id) {
+        Review review = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Отзыв не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        ReviewToRetrieve dto = new ReviewToRetrieve();
+        dto.setComment(review.getComment());
+        dto.setRating(review.getRating());
+
+        return dto;
+    }
+
+    @Override
     public List<ReviewToRetrieve> findReviewsWithPageble(PageRequest of) {
-        Page<Review> all = repository.findAll(of);
-        List<Review> content = all.getContent();
-        return null;
+        Page<Review> page = repository.findAll(of);
+
+        List<ReviewToRetrieve> result = new ArrayList<>();
+
+        for (Review review : page.getContent()) {
+            ReviewToRetrieve dto = new ReviewToRetrieve();
+            dto.setComment(review.getComment());
+            dto.setRating(review.getRating());
+            result.add(dto);
+        }
+
+        return result;
     }
 
     @Override

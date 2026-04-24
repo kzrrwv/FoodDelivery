@@ -32,22 +32,26 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderToRetrieve>> getOrders(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        List<OrderToRetrieve> orders =
-                orderService.findOrdersWithPageable(PageRequest.of(page, size));
+    public ResponseEntity<List<OrderToRetrieve>> getOrders(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size){
 
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(
+                orderService.findOrdersWithPageable(PageRequest.of(page, size))
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id){
-        return ResponseEntity.ok(new OrderDTO());
+    public ResponseEntity<OrderToRetrieve> getOrderById(@PathVariable Long id){
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO){
-        OrderDTO updated = orderService.updateOrder(id, orderDTO);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<OrderDTO> updateOrder(
+            @PathVariable Long id,
+            @RequestBody @Valid OrderDTO orderDTO){
+
+        return ResponseEntity.ok(orderService.updateOrder(id, orderDTO));
     }
 
     @DeleteMapping("/{id}")

@@ -71,19 +71,4 @@ public class UserDTO {
     public void setUsername(String username) {
         this.username = username;
     }
-
-//    public static User fromUserDTO(UserDTO userDTO) {
-//        User user = new User();
-//        user.setUsername(userDTO.getUsername());
-//        user.setEmail(userDTO.getEmail());
-//        user.setPassword(userDTO.getPassword());
-//        user.setPhoneNumber(userDTO.getPhoneNumber());
-//        try{
-//            user.setRole(UserRole.valueOf(userDTO.getRole()));
-//        } catch(IllegalArgumentException e){
-//            log.debug("Неправильный формат роли, по умолчанию присваеваем customer.");
-//            user.setRole(UserRole.CUSTOMER);
-//        }
-//        return user;
-//    }
 }

@@ -6,6 +6,14 @@ public class UserToRetrieve {
 
     private String email;
 
+    public UserToRetrieve() {
+    }
+
+    public UserToRetrieve(String userName, String email) {
+        this.userName = userName;
+        this.email = email;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }

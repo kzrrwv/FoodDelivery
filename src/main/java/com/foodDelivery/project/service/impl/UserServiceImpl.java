@@ -11,14 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@PreAuthorize(value = "hasRole('ROLE_ADMIN')")
 public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
@@ -40,6 +43,27 @@ public class UserServiceImpl implements UserService {
         };
     }
 
+    @Override
+    public UserToRetrieve changeRole(Long id, UserRole role){
+        User user = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Пользователь не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        user.setRole(role);
+
+        User saved = repository.save(user);
+
+        log.info("Роль пользователя с id {} изменена на {}", id, role);
+
+        UserToRetrieve dto = new UserToRetrieve();
+        dto.setUserName(saved.getUsername());
+        dto.setEmail(saved.getEmail());
+
+        return dto;
+    }
+
     public void createUser(UserDTO userDTO){
         User user = new User();
         user.setUsername(userDTO.getUsername());
@@ -49,7 +73,7 @@ public class UserServiceImpl implements UserService {
         try{
             user.setRole(UserRole.valueOf(userDTO.getRole()));
         } catch(IllegalArgumentException e){
-            log.debug("Неправильный формат роли, по умолчанию присваеваем customer.");
+            log.debug("Неправильный формат роли, по умолчанию присваеваем user.");
             user.setRole(UserRole.ROLE_USER);
         }
         repository.save(user);
@@ -64,7 +88,25 @@ public class UserServiceImpl implements UserService {
             userToRetrieve.setEmail(user.getEmail());
             userToRetrieves.add(userToRetrieve);
         }
+        if(userToRetrieves.isEmpty()){
+            return new ArrayList<>(Arrays.asList(new UserToRetrieve("user1", "email1")));
+        }
         return userToRetrieves;
+    }
+
+    @Override
+    public UserToRetrieve getUserById(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        "Пользователь не найден",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        UserToRetrieve dto = new UserToRetrieve();
+        dto.setUserName(user.getUsername());
+        dto.setEmail(user.getEmail());
+
+        return dto;
     }
 
     @Override

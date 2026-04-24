@@ -32,21 +32,26 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductToRetrieve>> getProducts(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size){
-        List<ProductToRetrieve> products =
-                productService.findProductsWithPageable(PageRequest.of(page, size));
-        return ResponseEntity.ok(products);
+    public ResponseEntity<List<ProductToRetrieve>> getProducts(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size){
+
+        return ResponseEntity.ok(
+                productService.findProductsWithPageable(PageRequest.of(page, size))
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id){
-        return ResponseEntity.ok(new ProductDTO());
+    public ResponseEntity<ProductToRetrieve> getProductById(@PathVariable Long id){
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO){
-        ProductDTO updated = productService.updateProduct(id, productDTO);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Long id,
+            @RequestBody @Valid ProductDTO productDTO){
+
+        return ResponseEntity.ok(productService.updateProduct(id, productDTO));
     }
 
     @DeleteMapping("/{id}")

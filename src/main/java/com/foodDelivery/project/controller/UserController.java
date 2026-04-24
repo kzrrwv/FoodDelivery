@@ -1,6 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.UserDTO;
+import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
 import com.foodDelivery.project.service.UserService;
 import jakarta.validation.Valid;
@@ -14,7 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private UserService service;
+
+    private final UserService service;
 
     @Autowired
     public UserController(UserService service) {
@@ -33,14 +35,24 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
-        return ResponseEntity.ok(new UserDTO());
+    public ResponseEntity<UserToRetrieve> getUserById(@PathVariable Long id){
+        return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO){
-        UserDTO updated = service.updateUser(id, userDTO);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable Long id,
+            @RequestBody @Valid UserDTO userDTO){
+
+        return ResponseEntity.ok(service.updateUser(id, userDTO));
+    }
+
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<UserToRetrieve> changeUserRole(
+            @PathVariable Long id,
+            @RequestParam UserRole role){
+
+        return ResponseEntity.ok(service.changeRole(id, role));
     }
 
     @DeleteMapping("/{id}")
