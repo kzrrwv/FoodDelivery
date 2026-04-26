@@ -14,7 +14,7 @@ public class OrderItem {
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private Order order_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product_id;
 

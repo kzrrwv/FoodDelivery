@@ -31,6 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String authorization = request.getHeader("Authorization");
 
         if(authorization == null || !authorization.startsWith("Bearer ")){
+            System.out.println("не правильный http запрос без Bearer " + authorization + "полный запрос " + request);
             filterChain.doFilter(request, response);
             return;
         }
@@ -38,8 +39,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = authorization.substring(7);
         String username = jwtService.extractUsername(token);
 
+        System.out.println(token + " " + username + " ");
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         if(username == null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.userDetailsService().loadUserByUsername(username);
+            System.out.println(jwtService.isTokenValid(token, userDetails));
             if(jwtService.isTokenValid(token, userDetails)){
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

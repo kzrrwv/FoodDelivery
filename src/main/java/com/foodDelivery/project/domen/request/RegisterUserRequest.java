@@ -1,4 +1,4 @@
-package com.foodDelivery.project.domen.dto;
+package com.foodDelivery.project.domen.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

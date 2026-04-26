@@ -1,4 +1,4 @@
-package com.foodDelivery.project;
+package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.User;
@@ -6,12 +6,10 @@ import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.impl.UserServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;

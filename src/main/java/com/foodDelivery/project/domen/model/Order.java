@@ -42,7 +42,7 @@ public class Order {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user_id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "review_id", insertable = false, updatable = false)
     private Review review_id;
 

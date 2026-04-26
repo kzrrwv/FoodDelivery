@@ -1,4 +1,4 @@
-package com.foodDelivery.project;
+package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.ProductDTO;
 import com.foodDelivery.project.domen.model.Product;
@@ -6,13 +6,10 @@ import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ProductRepository;
 import com.foodDelivery.project.service.impl.ProductServiceImpl;
-import org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;

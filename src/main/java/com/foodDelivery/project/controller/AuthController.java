@@ -1,7 +1,7 @@
 package com.foodDelivery.project.controller;
 
-import com.foodDelivery.project.domen.dto.LoginRequest;
-import com.foodDelivery.project.domen.dto.RegisterUserRequest;
+import com.foodDelivery.project.domen.request.LoginRequest;
+import com.foodDelivery.project.domen.request.RegisterUserRequest;
 import com.foodDelivery.project.domen.responce.JwtResponse;
 import com.foodDelivery.project.security.AuthService;
 import org.springframework.web.bind.annotation.*;

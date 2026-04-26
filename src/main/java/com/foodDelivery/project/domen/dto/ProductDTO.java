@@ -15,7 +15,6 @@ public class ProductDTO {
     @Positive
     private int amount;
 
-    private int warehouse_id;
 
     public String getName() {
         return name;
@@ -29,10 +28,6 @@ public class ProductDTO {
         return amount;
     }
 
-    public int getWarehouse_id() {
-        return warehouse_id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -43,9 +38,5 @@ public class ProductDTO {
 
     public void setAmount(int amount) {
         this.amount = amount;
-    }
-
-    public void setWarehouse_id(int warehouse_id) {
-        this.warehouse_id = warehouse_id;
     }
 }

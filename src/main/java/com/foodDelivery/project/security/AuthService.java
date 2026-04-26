@@ -1,12 +1,11 @@
 package com.foodDelivery.project.security;
 
-import com.foodDelivery.project.domen.dto.LoginRequest;
-import com.foodDelivery.project.domen.dto.RegisterUserRequest;
+import com.foodDelivery.project.domen.request.LoginRequest;
+import com.foodDelivery.project.domen.request.RegisterUserRequest;
 import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.JwtResponse;
 import com.foodDelivery.project.repository.UserRepository;
-import jakarta.security.auth.message.AuthException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

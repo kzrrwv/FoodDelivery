@@ -1,7 +1,5 @@
 package com.foodDelivery.project.exception;
-import com.foodDelivery.project.domen.dto.ErrorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.foodDelivery.project.domen.responce.ErrorResponse;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;

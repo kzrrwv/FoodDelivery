@@ -1,5 +1,6 @@
 package com.foodDelivery.project.config;
 
+import com.foodDelivery.project.security.JwtAuthFilter;
 import com.foodDelivery.project.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -24,9 +26,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableMethodSecurity
 public class SecurityConfig {
     private UserServiceImpl service;
+    private JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(UserServiceImpl service) {
+    public SecurityConfig(UserServiceImpl service, JwtAuthFilter jwtAuthFilter) {
         this.service = service;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
@@ -36,21 +40,24 @@ public class SecurityConfig {
                         request.requestMatchers("/swagger-ui.html", "swagger-ui/**", "/v3/api-docs/**", "/auth/**")
                                 .permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider());
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("*");
-            }
-        };
-    }
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://localhost:5173")
+//                        .allowedMethods("*");
+//            }
+//        };
+//    }
+
+
 
 
     @Bean

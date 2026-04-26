@@ -1,16 +1,14 @@
-package com.foodDelivery.project;
+package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.repository.ReviewRepository;
 import com.foodDelivery.project.service.impl.ReviewServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

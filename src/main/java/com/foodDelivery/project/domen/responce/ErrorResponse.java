@@ -1,4 +1,4 @@
-package com.foodDelivery.project.domen.dto;
+package com.foodDelivery.project.domen.responce;
 
 public class ErrorResponse {
 

@@ -6,7 +6,8 @@ import com.foodDelivery.project.domen.model.Warehouse;
 import java.util.List;
 
 public interface WarehouseService {
-    void createWarehouse(WarehouseDTO warehouseDTO);
+
+    void createWarehouse(Long warehouseId, WarehouseDTO warehouseDTO);
 
     List<Warehouse> getWarehouses();
 
