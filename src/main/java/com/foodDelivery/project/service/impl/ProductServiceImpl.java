@@ -26,7 +26,6 @@ public class ProductServiceImpl implements ProductService {
 
     private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    @Autowired
     public ProductServiceImpl(ProductRepository repository) {
         this.repository = repository;
     }
@@ -77,6 +76,7 @@ public class ProductServiceImpl implements ProductService {
         dto.setPrice(product.getPrice());
         dto.setAmount(product.getAmount());
 
+        log.info("Продукт с id {} успешно получен!", id);
         return dto;
     }
 
@@ -92,6 +92,8 @@ public class ProductServiceImpl implements ProductService {
             dto.setAmount(product.getAmount());
             result.add(dto);
         }
+
+        log.info("Список продуктов успешно получен!");
         return result;
     }
 
@@ -113,6 +115,8 @@ public class ProductServiceImpl implements ProductService {
         dto.setPrice(saved.getPrice());
         dto.setName(saved.getName());
         dto.setAmount(saved.getAmount());
+
+        log.info("Продукт с id {} успешно изменён!", id);
         return dto;
     }
 

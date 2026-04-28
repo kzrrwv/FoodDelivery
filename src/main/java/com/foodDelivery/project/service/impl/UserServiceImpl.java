@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(UserRole.ROLE_USER);
         }
         repository.save(user);
+        log.info("Пользователь" + user.getUsername() +  "успешно создан.");
     }
 
     public List<UserToRetrieve> getUsers(){
@@ -92,6 +93,7 @@ public class UserServiceImpl implements UserService {
         if(userToRetrieves.isEmpty()){
             return new ArrayList<>(Arrays.asList(new UserToRetrieve("user1", "email1")));
         }
+        log.info("Успешно получен список пользователей!");
         return userToRetrieves;
     }
 
@@ -107,7 +109,7 @@ public class UserServiceImpl implements UserService {
         UserToRetrieve dto = new UserToRetrieve();
         dto.setUserName(user.getUsername());
         dto.setEmail(user.getEmail());
-
+        log.info("Получен пользователь с id {}", id);
         return dto;
     }
 
@@ -135,7 +137,7 @@ public class UserServiceImpl implements UserService {
         dto.setPassword(saved.getPassword());
         dto.setPhoneNumber(saved.getPhoneNumber());
         dto.setRole(saved.getRole().name());
-
+        log.info("Пользователь с id {} успешно обновлен!", id);
         return dto;
     }
 

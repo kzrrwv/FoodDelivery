@@ -44,6 +44,8 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
+    @GetMapping()
+
     @PutMapping("/{id}")
     public ResponseEntity<ReviewDTO> updateReview(
             @PathVariable Long id,

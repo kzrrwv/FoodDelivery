@@ -68,6 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
         dto.setComment(review.getComment());
         dto.setRating(review.getRating());
 
+        log.info("Отзыв с id {} успешно получен!", id);
         return dto;
     }
 
@@ -84,6 +85,7 @@ public class ReviewServiceImpl implements ReviewService {
             result.add(dto);
         }
 
+        log.info("Список отзывов успешно получен!");
         return result;
     }
 

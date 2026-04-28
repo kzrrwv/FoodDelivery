@@ -42,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveredAt(orderDTO.getDeliveredAt());
         order.setPaymentMethod(orderDTO.getPaymentMethod());
         repository.save(order);
-        log.info("Заказ успешно добавлен.");
+        log.info("Заказ успешно добавлен!");
     }
 
     @Override
@@ -76,6 +76,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setDeliveryFee(order.getDeliveryFee());
         dto.setTotalAmount(order.getTotalAmount());
 
+        log.info("Заказ с id {} успешно получен!", id);
         return dto;
     }
 
@@ -95,6 +96,7 @@ public class OrderServiceImpl implements OrderService {
             result.add(dto);
         }
 
+        log.info("Список заказов успешно получен!");
         return result;
     }
 
@@ -121,6 +123,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setStatus(saved.getStatus());
         dto.setComment(saved.getComment());
 
+        log.info("Заказ с id {} успешно изменён!", id);
         return dto;
     }
 
