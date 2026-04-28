@@ -35,20 +35,20 @@ public class Order {
     private List<OrderItem> orderItems;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", insertable = false, updatable = false)
+    @JoinColumn(name = "address_id")
     private Address address_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private User user_id;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "review_id", insertable = false, updatable = false)
+    @JoinColumn(name = "review_id")
     private Review review_id;
 
     //та же табличка user, где role курьер
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "courier_id", insertable = false, updatable = false)
+    @JoinColumn(name = "courier_id")
     private User courier_id;
 
     public Order() {

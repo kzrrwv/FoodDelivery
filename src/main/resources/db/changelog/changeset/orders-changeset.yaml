@@ -43,13 +43,13 @@ databaseChangeLog:
               - column:
                   name: address_id
                   type: bigint
-                  constraints:
-                    nullable: false
+#                  constraints:
+#                    nullable: false
               - column:
                   name: user_id
                   type: bigint
-                  constraints:
-                    nullable: false
+#                  constraints:
+#                    nullable: false
               - column:
                   name: courier_id
                   type: bigint
