@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public UserToRetrieve changeRole(Long id, UserRole role){
         User user = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         return dto;
     }
 
-//    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public void createUser(UserDTO userDTO){
         User user = new User();
         user.setUsername(userDTO.getUsername());
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public UserToRetrieve getUserById(Long id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Пользователь не найден!", HttpStatus.NOT_FOUND));
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     public void deleteUser(Long id) {
         User user = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Пользователь не найден!", HttpStatus.NOT_FOUND));

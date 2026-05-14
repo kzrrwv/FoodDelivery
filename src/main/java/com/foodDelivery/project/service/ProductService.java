@@ -11,7 +11,7 @@ public interface ProductService {
 
     List<ProductToRetrieve> getProducts();
 
-    void createProduct(ProductDTO productDTO);
+    void createProduct(ProductDTO productDTO, Long warehouse_id);
 
     List<ProductToRetrieve> findProductsWithPageable(PageRequest of);
 

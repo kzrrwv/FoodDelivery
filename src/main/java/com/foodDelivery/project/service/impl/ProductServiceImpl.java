@@ -2,10 +2,14 @@ package com.foodDelivery.project.service.impl;
 
 import com.foodDelivery.project.domen.dto.ProductDTO;
 import com.foodDelivery.project.domen.model.Product;
+import com.foodDelivery.project.domen.model.Warehouse;
 import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ProductRepository;
+import com.foodDelivery.project.repository.WarehouseRepository;
 import com.foodDelivery.project.service.ProductService;
+import com.foodDelivery.project.service.WarehouseService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +23,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@PreAuthorize(value = "hasRole('ROLE_ADMIN) or hasRole('ROLE_COURIER')")
+@PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_COURIER')")
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository repository;
 
+    private WarehouseRepository warehouseRepository;
+
     private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    public ProductServiceImpl(ProductRepository repository) {
+    public ProductServiceImpl(ProductRepository repository, WarehouseRepository warehouseRepository) {
         this.repository = repository;
+        this.warehouseRepository = warehouseRepository;
     }
 
     @Override
-    public void createProduct(ProductDTO productDTO){
+    @Transactional
+    public void createProduct(ProductDTO productDTO, Long warehouse_id){
         Product product = new Product();
         product.setAmount(productDTO.getAmount());
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
+
+        Warehouse warehouse = warehouseRepository.findById(warehouse_id)
+                .orElse(null);
+
+        if(warehouse == null){
+            Warehouse newWarehouse = new Warehouse();
+            warehouse = warehouseRepository.save(newWarehouse);
+        }
+        product.setWarehouse_id(warehouse);
         repository.save(product);
+
+        List<Product> warehousesProducts = warehouse.getProducts();
+        warehousesProducts.add(product);
+
+        warehouseRepository.save(warehouse);
         log.info("Продукт успешно добавлен.");
     }
 

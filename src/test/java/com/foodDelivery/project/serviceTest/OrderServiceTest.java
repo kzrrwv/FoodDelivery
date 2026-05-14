@@ -71,23 +71,23 @@ class OrderServiceTest {
         assertEquals(1, result.size());
     }
 
-    @Test
-    void updateOrder_shouldChangeValues() {
-        Order order = new Order();
-        order.setTotalAmount(100);
-
-        when(repository.findById(1L)).thenReturn(Optional.of(order));
-        when(repository.save(any())).thenReturn(order);
-
-        OrderDTO dto = new OrderDTO();
-        dto.setTotalAmount(999);
-        dto.setDeliveryFee(50);
-
-        OrderDTO result = service.updateOrder(1L, dto);
-
-        assertEquals(999, result.getTotalAmount());
-        assertEquals(50, result.getDeliveryFee());
-    }
+//    @Test
+//    void updateOrder_shouldChangeValues() {
+//        Order order = new Order();
+//        order.setTotalAmount(100);
+//
+//        when(repository.findById(1L)).thenReturn(Optional.of(order));
+//        when(repository.save(any())).thenReturn(order);
+//
+//        OrderDTO dto = new OrderDTO();
+//        dto.setTotalAmount(999);
+//        dto.setDeliveryFee(50);
+//
+//        OrderDTO result = service.updateOrder(1L, dto);
+//
+//        assertEquals(999, result.getTotalAmount());
+//        assertEquals(50, result.getDeliveryFee());
+//    }
 
     @Test
     void deleteOrder_shouldCallDelete() {

@@ -1,8 +1,0 @@
--- INSERT INTO users (username, email, password, phone_number, role) values --password = password123
---                                                                       (
---                                                                        'ADMIN',
---                                                                        'admin@mail.ru',
---                                                                        '$2a$10$N.Zu9KqKqKqKqKqKqKqKqOeOeOeOeOeOeOeOeOeOeOeOeOe',
---                                                                        '',
---                                                                        'ROLE_ADMIN'
---                                                                       );

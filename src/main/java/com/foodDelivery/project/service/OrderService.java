@@ -1,6 +1,7 @@
 package com.foodDelivery.project.service;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
+import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.domen.responce.ProductToRetrieve;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +16,7 @@ public interface OrderService {
 
     List<OrderToRetrieve> findOrdersWithPageable(PageRequest of);
 
-    OrderDTO updateOrder(Long id, OrderDTO orderDTO);
+    OrderDTO updateOrder(Long id, OrderDTO orderDTO, ReviewDTO reviewDTO);
 
     void deleteOrder(Long id);
 

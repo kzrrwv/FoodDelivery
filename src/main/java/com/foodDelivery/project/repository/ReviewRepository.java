@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     //получение отзывов по продукту, отсортированные по дате
-    @Query(value = "SELECT * FROM reviews WHERE product_id = :productId ORDER BY created_at DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM review WHERE product_id = :productId ORDER BY created_at DESC", nativeQuery = true)
     List<Review> findReviewsByProductIdOrderByCreatedAtDesc(@Param("productId") Long productId);
 }

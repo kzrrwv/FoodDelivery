@@ -16,7 +16,7 @@ public class Product {
     private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id", insertable = false, updatable = false)
+    @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse_id;
 
 

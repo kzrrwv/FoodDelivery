@@ -2,12 +2,14 @@ package com.foodDelivery.project.service.impl;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.dto.UserDTO;
+import com.foodDelivery.project.domen.model.Order;
 import com.foodDelivery.project.domen.model.Product;
 import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ReviewRepository;
 import com.foodDelivery.project.service.ReviewService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
         this.repository = repository;
     }
 
+    //удалить
     @Override
     public void createReview(ReviewDTO reviewDTO){
         Review review = new Review();
@@ -39,6 +42,16 @@ public class ReviewServiceImpl implements ReviewService {
         review.setComment(reviewDTO.getComment());
         repository.save(review);
         log.info("Отзыв успешно добавлен.");
+    }
+
+    @Override
+    @Transactional
+    public Review createReviewWithOrder(ReviewDTO reviewDTO, Order order) {
+        Review review = new Review();
+        review.setRating(reviewDTO.getRating());
+        review.setComment(reviewDTO.getComment());
+        review.setOrder_id(order);
+        return repository.save(review);
     }
 
     @Override

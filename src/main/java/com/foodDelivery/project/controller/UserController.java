@@ -4,6 +4,8 @@ import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
 import com.foodDelivery.project.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "Users", description = "Управление пользователями")
 public class UserController {
 
     private final UserService service;
@@ -24,22 +27,26 @@ public class UserController {
     }
 
     @PostMapping
+    @Operation(summary = "Создать пользователя")
     public ResponseEntity<Void> addUser(@RequestBody @Valid UserDTO userDTO){
         service.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
+    @Operation(summary = "Получить всех пользователей")
     public ResponseEntity<List<UserToRetrieve>> getUsers(){
         return ResponseEntity.ok(service.getUsers());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Получить пользователя по ID")
     public ResponseEntity<UserToRetrieve> getUserById(@PathVariable Long id){
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Обновить пользователя")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long id,
             @RequestBody @Valid UserDTO userDTO){
@@ -48,6 +55,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/role")
+    @Operation(summary = "Изменить роль пользователя")
     public ResponseEntity<UserToRetrieve> changeUserRole(
             @PathVariable Long id,
             @RequestParam UserRole role){
@@ -56,6 +64,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить пользователя")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         service.deleteUser(id);
         return ResponseEntity.noContent().build();

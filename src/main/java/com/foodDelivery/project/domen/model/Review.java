@@ -1,6 +1,7 @@
 package com.foodDelivery.project.domen.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class Review {
 
     private String comment;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @OneToOne(fetch = FetchType.EAGER)

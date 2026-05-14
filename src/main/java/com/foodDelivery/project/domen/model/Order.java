@@ -3,6 +3,7 @@ package com.foodDelivery.project.domen.model;
 import com.foodDelivery.project.domen.model.enums.OrderStatus;
 import com.foodDelivery.project.domen.model.enums.PaymentMethod;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Order {
 
     private String comment;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     private LocalDateTime deliveredAt;

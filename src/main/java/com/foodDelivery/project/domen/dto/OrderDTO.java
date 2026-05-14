@@ -1,5 +1,6 @@
 package com.foodDelivery.project.domen.dto;
 
+import com.foodDelivery.project.domen.model.OrderItem;
 import com.foodDelivery.project.domen.model.enums.OrderStatus;
 import com.foodDelivery.project.domen.model.enums.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,10 +8,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Schema(title = "endpoint для заказов")
 @Tag(name = "OrderDTO", description = "")
 public class OrderDTO {
-
+    //добавить два поля из reviewDTO
     @Positive
     private int totalAmount;
 
@@ -23,6 +26,9 @@ public class OrderDTO {
     @Size(max = 500)
     private String comment;
 
+    @Positive
+    private int rating;
+
     @NotNull
     @PastOrPresent
     private LocalDateTime createdAt;
@@ -32,6 +38,8 @@ public class OrderDTO {
 
     @NotNull
     private PaymentMethod paymentMethod;
+
+    private List<OrderItem> orderItems;
 
     public int getTotalAmount() {
         return totalAmount;
@@ -87,5 +95,21 @@ public class OrderDTO {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

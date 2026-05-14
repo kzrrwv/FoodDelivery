@@ -1,6 +1,8 @@
 package com.foodDelivery.project.service;
 
 import com.foodDelivery.project.domen.dto.ReviewDTO;
+import com.foodDelivery.project.domen.model.Order;
+import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import org.springframework.data.domain.PageRequest;
 
@@ -19,4 +21,6 @@ public interface ReviewService {
     void delete(Long id);
 
     ReviewToRetrieve getReviewById(Long id);
+
+    Review createReviewWithOrder(ReviewDTO reviewDTO, Order order);
 }

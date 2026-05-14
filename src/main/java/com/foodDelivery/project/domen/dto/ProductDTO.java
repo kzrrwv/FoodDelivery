@@ -7,13 +7,14 @@ public class ProductDTO {
 
     @NotBlank
     private String name;
-
-    @NotBlank
+    
     @Positive
     private int price;
 
     @Positive
     private int amount;
+
+    private Long warehouse_id;
 
 
     public String getName() {
@@ -38,5 +39,13 @@ public class ProductDTO {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public Long getWarehouse_id() {
+        return warehouse_id;
+    }
+
+    public void setWarehouse_id(Long warehouse_id) {
+        this.warehouse_id = warehouse_id;
     }
 }
