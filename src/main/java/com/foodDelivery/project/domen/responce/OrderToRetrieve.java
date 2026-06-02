@@ -4,6 +4,8 @@ import com.foodDelivery.project.domen.model.enums.OrderStatus;
 
 public class OrderToRetrieve {
 
+    private Long id;
+
     private int totalAmount;
 
     private int deliveryFee;
@@ -11,6 +13,14 @@ public class OrderToRetrieve {
     private OrderStatus status;
 
     private String comment;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;

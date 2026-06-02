@@ -1,5 +1,6 @@
 package com.foodDelivery.project.domen.request;
 
+import com.foodDelivery.project.domen.model.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -21,8 +22,18 @@ public class RegisterUserRequest {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).+$", message = "Пароль должен содержать одну цифру, одну строчную и одну заглавную букву!")
     private String password;
 
+    private UserRole userRole;
+
     public RegisterUserRequest() {
 
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
     }
 
     public String getUsername() {

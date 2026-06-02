@@ -1,8 +1,5 @@
 package com.foodDelivery.project.domen.dto;
 
-import com.foodDelivery.project.domen.model.User;
-import com.foodDelivery.project.domen.model.enums.UserRole;
-import com.foodDelivery.project.service.impl.UserServiceImpl;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

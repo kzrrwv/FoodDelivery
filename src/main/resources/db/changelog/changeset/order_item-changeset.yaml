@@ -19,6 +19,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: amount
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
                   name: order_id
                   type: bigint
                   constraints:

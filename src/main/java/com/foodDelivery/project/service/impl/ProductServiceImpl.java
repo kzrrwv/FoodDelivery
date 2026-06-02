@@ -8,11 +8,9 @@ import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ProductRepository;
 import com.foodDelivery.project.repository.WarehouseRepository;
 import com.foodDelivery.project.service.ProductService;
-import com.foodDelivery.project.service.WarehouseService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_COURIER')")
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository repository;
@@ -38,6 +35,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     @Transactional
     public void createProduct(ProductDTO productDTO, Long warehouse_id){
         Product product = new Product();
@@ -63,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<ProductToRetrieve> getProducts(){
         List<Product> all = repository.findAll();
 
@@ -88,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public ProductToRetrieve getProductById(Long id) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
@@ -107,6 +107,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<ProductToRetrieve> findProductsWithPageable(PageRequest of) {
         Page<Product> all = repository.findAll(of);
         List<ProductToRetrieve> result = new ArrayList<>();
@@ -126,6 +127,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(
@@ -149,6 +151,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteProduct(Long id) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Продукт не найден!", HttpStatus.NOT_FOUND));

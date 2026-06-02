@@ -3,22 +3,26 @@ package com.foodDelivery.project.serviceTest;
 import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.model.Order;
 import com.foodDelivery.project.domen.model.Review;
-import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
+import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ReviewRepository;
+import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.impl.ReviewServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -26,76 +30,103 @@ import static org.mockito.Mockito.*;
 class ReviewServiceTest {
 
     @Mock
-    private ReviewRepository repository;
+    private ReviewRepository reviewRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
-    private ReviewServiceImpl service;
+    private ReviewServiceImpl reviewService;
 
-    @Test
-    void createReview_success() {
+    @Mock
+    private Authentication authentication;
 
-        ReviewDTO dto = new ReviewDTO();
-        dto.setComment("good");
-        dto.setRating(5);
+    @Mock
+    private SecurityContext securityContext;
 
-        service.createReview(dto);
+    private User testUser;
+    private Order testOrder;
+    private Review testReview;
+    private ReviewDTO testReviewDTO;
 
-        verify(repository).save(any(Review.class));
+    @BeforeEach
+    void setUp() {
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+
+        testOrder = new Order();
+        testOrder.setId(1L);
+        testOrder.setUser_id(testUser);
+
+        testReview = new Review();
+        testReview.setId(1L);
+        testReview.setRating(5);
+        testReview.setComment("Great!");
+        testReview.setUser_id(testUser);
+        testReview.setOrder_id(testOrder);
+
+        testReviewDTO = new ReviewDTO();
+        testReviewDTO.setRating(4);
+        testReviewDTO.setComment("Good but not perfect");
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getName()).thenReturn("testUser");
     }
 
     @Test
-    void getReviewById_success() {
+    void shouldCreateReviewWithOrder_whenValid() {
+        // Arrange
+        when(userRepository.findUserByUsername("testUser")).thenReturn(Optional.of(testUser));
+        when(reviewRepository.save(any(Review.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Review review = new Review();
+        // Act
+        Review result = reviewService.createReviewWithOrder(testReviewDTO, testOrder);
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(review));
-
-        ReviewToRetrieve result = service.getReviewById(1L);
-
-        assertNotNull(result);
+        // Assert
+        assertThat(result.getRating()).isEqualTo(4);
+        assertThat(result.getComment()).isEqualTo("Good but not perfect");
+        assertThat(result.getOrder_id()).isEqualTo(testOrder);
+        assertThat(result.getUser_id()).isEqualTo(testUser);
+        verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
     @Test
-    void findReviewsWithPageble_success() {
+    void shouldThrowException_whenReviewNotFoundOnUpdate() {
+        // Arrange
+        when(reviewRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Review review = new Review();
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            reviewService.updateReview(999L, testReviewDTO);
+        });
 
-        when(repository.findAll(any(PageRequest.class)))
-                .thenReturn(new PageImpl<>(List.of(review)));
-
-        List<ReviewToRetrieve> result =
-                service.findReviewsWithPageble(PageRequest.of(0, 5));
-
-        assertEquals(1, result.size());
+        assertThat(exception.getMessage()).contains("Отзыв не найден");
+        assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        verify(reviewRepository, never()).save(any(Review.class));
     }
 
     @Test
-    void updateReview_success() {
+    void shouldThrowException_whenUserDoesNotOwnReview() {
+        // Arrange
+        User differentUser = new User();
+        differentUser.setId(2L);
+        differentUser.setUsername("differentUser");
 
-        Review review = new Review();
+        Review ownedByDifferentUser = new Review();
+        ownedByDifferentUser.setId(1L);
+        ownedByDifferentUser.setUser_id(differentUser);
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(review));
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(ownedByDifferentUser));
+        when(userRepository.findUserByUsername("testUser")).thenReturn(Optional.of(testUser));
 
-        when(repository.save(any(Review.class)))
-                .thenReturn(review);
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            reviewService.updateReview(1L, testReviewDTO);
+        });
 
-        ReviewDTO dto = new ReviewDTO();
-        dto.setComment("updated");
-
-        ReviewDTO result = service.updateReview(1L, dto);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void delete_notFound() {
-
-        when(repository.findById(1L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(BusinessException.class,
-                () -> service.delete(1L));
+        assertThat(exception.getMessage()).contains("Это не ваш отзыв");
+        assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 }

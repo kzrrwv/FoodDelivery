@@ -10,6 +10,8 @@ public class OrderItem {
 
     private int price;
 
+    private int amount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order_id;
@@ -52,5 +54,13 @@ public class OrderItem {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 }

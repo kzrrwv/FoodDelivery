@@ -10,7 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    //получить продукты по категории отсортированные по цене
-    @Query(value = "SELECT * FROM product WHERE category_id = :categoryId ORDER BY price ASC", nativeQuery = true)
-    List<Product> findByCategoryOrderByPriceAsc(@Param("categoryId") Long categoryId);
+
 }

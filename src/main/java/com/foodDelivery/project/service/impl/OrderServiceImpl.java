@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
                                     "Продукт не найден!",
                                     HttpStatus.NOT_FOUND));
 
-            if (dbProduct.getAmount() <= 0) {
+            if (dbProduct.getAmount() < product.getAmount()) {
                 throw new BusinessException(
                         "Товар закончился на складе!",
                         HttpStatus.BAD_REQUEST);
@@ -110,6 +110,7 @@ public class OrderServiceImpl implements OrderService {
 
             OrderItem item = new OrderItem();
 
+            item.setAmount(product.getAmount());
             item.setProduct_id(dbProduct);
 
             item.setOrder_id(order);
@@ -118,14 +119,17 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setOrderItems(items);
+        Order savedOrder = repository.save(order);
 
         //из orderDTO сделать reviewDTO и передать в сервис
         ReviewDTO reviewDTO = new ReviewDTO();
         reviewDTO.setComment(orderDTO.getComment());
         reviewDTO.setRating(orderDTO.getRating());
 
-        order.setReview_id(reviewService.createReviewWithOrder(reviewDTO, order));
-        repository.save(order);
+        Review review = reviewService.createReviewWithOrder(reviewDTO, savedOrder);
+        savedOrder.setReview_id(review);
+
+        repository.save(savedOrder);
         log.info("Заказ успешно добавлен!");
     }
 
@@ -145,6 +149,7 @@ public class OrderServiceImpl implements OrderService {
         for(Order order : orders){
             OrderToRetrieve dto = new OrderToRetrieve();
 
+            dto.setId(order.getId());
             dto.setComment(order.getComment());
             dto.setStatus(order.getStatus());
             dto.setDeliveryFee(order.getDeliveryFee());
@@ -172,6 +177,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         OrderToRetrieve dto = new OrderToRetrieve();
+
+        dto.setId(order.getId());
         dto.setComment(order.getComment());
         dto.setStatus(order.getStatus());
         dto.setDeliveryFee(order.getDeliveryFee());
@@ -196,6 +203,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (Order order : page.getContent()) {
             OrderToRetrieve dto = new OrderToRetrieve();
+
+            dto.setId(order.getId());
             dto.setComment(order.getComment());
             dto.setStatus(order.getStatus());
             dto.setDeliveryFee(order.getDeliveryFee());
@@ -267,7 +276,11 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public void deleteOrder(Long id) {
         Order order = repository.findById(id)
-                .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new BusinessException(
+                                "Заказ не найден",
+                                HttpStatus.NOT_FOUND
+                        ));
 
         User currentUser = getCurrentUser();
 
@@ -276,6 +289,28 @@ public class OrderServiceImpl implements OrderService {
                     "Это не ваш заказ",
                     HttpStatus.FORBIDDEN
             );
+        }
+
+        // возвращаем товары на склад
+        for (OrderItem item : order.getOrderItems()) {
+
+            Product product = item.getProduct_id();
+
+            product.setAmount(
+                    product.getAmount() + item.getAmount()
+            );
+
+            productRepository.save(product);
+        }
+
+        // разрываем связь review -> order
+        if (order.getReview_id() != null) {
+
+            Review review = order.getReview_id();
+
+            review.setOrder_id(null);
+
+            order.setReview_id(null);
         }
 
         repository.delete(order);

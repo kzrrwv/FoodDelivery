@@ -8,19 +8,26 @@ import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.ProductRepository;
 import com.foodDelivery.project.repository.WarehouseRepository;
 import com.foodDelivery.project.service.impl.ProductServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,87 +35,113 @@ import static org.mockito.Mockito.*;
 class ProductServiceTest {
 
     @Mock
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
     @Mock
     private WarehouseRepository warehouseRepository;
 
     @InjectMocks
-    private ProductServiceImpl service;
+    private ProductServiceImpl productService;
 
-    @Test
-    void createProduct_success() {
+    private Product testProduct;
+    private Warehouse testWarehouse;
 
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Pizza");
-        dto.setPrice(100);
-        dto.setAmount(5);
+    @BeforeEach
+    void setUp() {
+        testProduct = new Product();
+        testProduct.setId(1L);
+        testProduct.setName("Classic Burger");
+        testProduct.setPrice(250);
+        testProduct.setAmount(50);
 
-        Warehouse warehouse = new Warehouse();
-        warehouse.setProducts(new ArrayList<>());
-
-        when(warehouseRepository.findById(1L))
-                .thenReturn(Optional.of(warehouse));
-
-        service.createProduct(dto, 1L);
-
-        verify(repository).save(any(Product.class));
+        testWarehouse = new Warehouse();
+        testWarehouse.setId(1L);
+        testWarehouse.setProducts(new ArrayList<>());
     }
 
     @Test
-    void getProductById_success() {
+    void shouldCreateProduct_whenValidData() {
+        // Arrange
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("New Product");
+        productDTO.setPrice(300);
+        productDTO.setAmount(20);
 
-        Product product = new Product();
-        product.setName("Pizza");
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(testWarehouse));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(product));
+        // Act
+        productService.createProduct(productDTO, 1L);
 
-        ProductToRetrieve result = service.getProductById(1L);
-
-        assertNotNull(result);
+        // Assert
+        verify(productRepository).save(any(Product.class));
+        verify(warehouseRepository).save(testWarehouse);
     }
 
     @Test
-    void findProductsWithPageable_success() {
+    void shouldThrowException_whenProductNotFoundForUpdate() {
+        // Arrange
+        ProductDTO updateDTO = new ProductDTO();
+        updateDTO.setName("Updated");
+        updateDTO.setPrice(200);
+        updateDTO.setAmount(10);
 
-        Product product = new Product();
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
-        when(repository.findAll(any(PageRequest.class)))
-                .thenReturn(new PageImpl<>(List.of(product)));
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> productService.updateProduct(999L, updateDTO));
 
-        List<ProductToRetrieve> result =
-                service.findProductsWithPageable(PageRequest.of(0, 5));
-
-        assertEquals(1, result.size());
+        assertThat(exception.getMessage()).contains("Продукт не найден");
     }
 
     @Test
-    void updateProduct_success() {
+    void shouldGetAllProducts_whenProductsExist() {
+        // Arrange
+        when(productRepository.findAll()).thenReturn(List.of(testProduct));
 
-        Product product = new Product();
+        // Act
+        List<ProductToRetrieve> result = productService.getProducts();
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(product));
-
-        when(repository.save(any(Product.class)))
-                .thenReturn(product);
-
-        ProductDTO dto = new ProductDTO();
-        dto.setName("Burger");
-
-        ProductDTO result = service.updateProduct(1L, dto);
-
-        assertNotNull(result);
+        // Assert
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("Classic Burger");
     }
 
     @Test
-    void deleteProduct_notFound() {
+    void shouldThrowException_whenNoProductsExist() {
+        // Arrange
+        when(productRepository.findAll()).thenReturn(List.of());
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.empty());
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> productService.getProducts());
 
-        assertThrows(BusinessException.class,
-                () -> service.deleteProduct(1L));
+        assertThat(exception.getMessage()).contains("Продукты не найдены");
+        assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "10, 50, 40",
+            "1, 100, 99",
+            "0, 20, 20"
+    })
+    void shouldUpdateAmountCorrectly(int newAmount, int currentAmount, int expected) {
+        // Arrange
+        testProduct.setAmount(currentAmount);
+        ProductDTO updateDTO = new ProductDTO();
+        updateDTO.setAmount(newAmount);
+        updateDTO.setName("Updated Product");
+        updateDTO.setPrice(100);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.save(any(Product.class))).thenReturn(testProduct);
+
+        // Act
+        productService.updateProduct(1L, updateDTO);
+
+        // Assert
+        assertThat(testProduct.getAmount()).isEqualTo(expected);
     }
 }

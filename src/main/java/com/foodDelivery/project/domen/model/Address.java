@@ -22,7 +22,7 @@ public class Address {
     private int floor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private User user_id;
 
     public Address() {

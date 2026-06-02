@@ -1,7 +1,6 @@
 package com.foodDelivery.project.service;
 
 import com.foodDelivery.project.domen.dto.UserDTO;
-import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.UserToRetrieve;
 import org.springframework.security.core.userdetails.UserDetailsService;

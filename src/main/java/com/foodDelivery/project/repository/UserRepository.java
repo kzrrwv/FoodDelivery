@@ -12,9 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    //найти пользователя по части email
-    @Query(value = "SELECT * FROM users WHERE email LIKE %:email%", nativeQuery = true)
-    List<User> findUsersByEmailLike(@Param("email") String email);
 
     Optional<User> findUserByUsername(String username);
 

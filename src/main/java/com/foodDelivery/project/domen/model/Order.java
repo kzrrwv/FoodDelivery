@@ -33,7 +33,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    @OneToMany(mappedBy = "order_id", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,7 +44,7 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user_id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "review_id")
     private Review review_id;
 

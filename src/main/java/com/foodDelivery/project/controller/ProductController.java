@@ -1,9 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.ProductDTO;
-import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.responce.ProductToRetrieve;
-import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +39,13 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "Получить список продуктов")
-    public ResponseEntity<List<ProductToRetrieve>> getProducts(
+    public ResponseEntity<List<ProductToRetrieve>> getProducts(){
+        return ResponseEntity.ok(productService.getProducts());
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "Получить список продуктов пагинация")
+    public ResponseEntity<List<ProductToRetrieve>> getProductsWithPageable(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size){
 

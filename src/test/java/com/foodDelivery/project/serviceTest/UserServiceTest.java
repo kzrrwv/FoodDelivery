@@ -2,20 +2,23 @@ package com.foodDelivery.project.serviceTest;
 
 import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.model.User;
-import com.foodDelivery.project.domen.responce.UserToRetrieve;
+import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.exception.BusinessException;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.impl.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -23,73 +26,70 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     @Mock
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserServiceImpl service;
+    private UserServiceImpl userService;
 
-    @Test
-    void createUser_success() {
+    private User testUser;
+    private UserDTO testUserDTO;
 
-        UserDTO dto = new UserDTO();
-        dto.setUsername("test");
-        dto.setRole("ROLE_USER");
+    @BeforeEach
+    void setUp() {
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setEmail("test@example.com");
+        testUser.setRole(UserRole.ROLE_USER);
 
-        service.createUser(dto);
-
-        verify(repository).save(any(User.class));
+        testUserDTO = new UserDTO();
+        testUserDTO.setUsername("newUsername");
+        testUserDTO.setEmail("new@example.com");
+        testUserDTO.setRole("ROLE_ADMIN");
     }
 
     @Test
-    void getUserById_success() {
+    void shouldChangeRole_whenUserExists() {
+        // Arrange
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User user = new User();
+        // Act
+        var result = userService.changeRole(1L, UserRole.ROLE_ADMIN);
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(user));
-
-        UserToRetrieve result = service.getUserById(1L);
-
-        assertNotNull(result);
+        // Assert
+        assertThat(testUser.getRole()).isEqualTo(UserRole.ROLE_ADMIN);
+        verify(userRepository, times(1)).save(testUser);
     }
 
     @Test
-    void getUsers_success() {
+    void shouldThrowException_whenUserNotFoundOnRoleChange() {
+        // Arrange
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        when(repository.findAll())
-                .thenReturn(List.of(new User()));
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            userService.changeRole(999L, UserRole.ROLE_ADMIN);
+        });
 
-        List<UserToRetrieve> result = service.getUsers();
-
-        assertEquals(1, result.size());
+        assertThat(exception.getMessage()).contains("Пользователь не найден");
+        assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
-    void updateUser_success() {
+    void shouldThrowException_whenUserNotFoundOnGet() {
+        // Arrange
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        User user = new User();
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            userService.getUserById(999L);
+        });
 
-        when(repository.findById(1L))
-                .thenReturn(Optional.of(user));
-
-        when(repository.save(any(User.class)))
-                .thenReturn(user);
-
-        UserDTO dto = new UserDTO();
-        dto.setRole("ROLE_ADMIN");
-
-        UserDTO result = service.updateUser(1L, dto);
-
-        assertNotNull(result);
-    }
-
-    @Test
-    void deleteUser_notFound() {
-
-        when(repository.findById(1L))
-                .thenReturn(Optional.empty());
-
-        assertThrows(BusinessException.class,
-                () -> service.deleteUser(1L));
+        assertThat(exception.getMessage()).contains("Пользователь не найден");
     }
 }

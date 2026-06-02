@@ -12,8 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository repository;
+    private PasswordEncoder passwordEncoder;
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -33,7 +38,8 @@ public class UserServiceImpl implements UserService {
 
     public UserDetailsService userDetailsService(){
         return username -> {
-            User user = repository.findUserByUsername(username).get();
+            User user = repository.findUserByUsername(username).orElseThrow(() ->
+                    new UsernameNotFoundException("Пользователь не найден!"));
                     return new org.springframework.security.core.userdetails.User(
                             user.getUsername(),
                             user.getPassword(),
@@ -69,7 +75,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhoneNumber(userDTO.getPhoneNumber());
         try{
             user.setRole(UserRole.valueOf(userDTO.getRole()));
@@ -122,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setPhoneNumber(userDTO.getPhoneNumber());
         try{
             user.setRole(UserRole.valueOf(userDTO.getRole()));
@@ -135,7 +141,7 @@ public class UserServiceImpl implements UserService {
         UserDTO dto = new UserDTO();
         dto.setEmail(saved.getEmail());
         dto.setUsername(saved.getUsername());
-        dto.setPassword(saved.getPassword());
+        dto.setPassword(passwordEncoder.encode(saved.getPassword()));
         dto.setPhoneNumber(saved.getPhoneNumber());
         dto.setRole(saved.getRole().name());
         log.info("Пользователь с id {} успешно обновлен!", id);
@@ -146,7 +152,35 @@ public class UserServiceImpl implements UserService {
     @Override
     @PreAuthorize(value = "hasRole('ROLE_USER')")
     public UserToRetrieve updateCurrentUser(UserDTO userDTO) {
-        return null;
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username = authentication.getName();
+
+        User user = repository.findUserByUsername(username)
+                .orElseThrow(() ->
+                        new BusinessException(
+                                "Пользователь не найден",
+                                HttpStatus.NOT_FOUND
+                        ));
+
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+
+        if(userDTO.getPassword() != null){
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        User saved = repository.save(user);
+
+        UserToRetrieve dto = new UserToRetrieve();
+        dto.setUserName(saved.getUsername());
+        dto.setEmail(saved.getEmail());
+
+        return dto;
     }
 
     @Override

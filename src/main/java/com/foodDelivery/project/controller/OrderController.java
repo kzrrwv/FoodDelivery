@@ -1,10 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
-import com.foodDelivery.project.domen.dto.ReviewDTO;
-import com.foodDelivery.project.domen.dto.UserDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
-import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +37,14 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "Получить заказы пользователя")
-    public ResponseEntity<List<OrderToRetrieve>> getOrders(
+    public ResponseEntity<List<OrderToRetrieve>> getOrders(){
+        return ResponseEntity.ok(orderService.getOrders());
+    }
+
+
+    @GetMapping("/page")
+    @Operation(summary = "Получить заказы пользователя пагинация")
+    public ResponseEntity<List<OrderToRetrieve>> getOrdersWithPageable(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size){
 

@@ -43,7 +43,7 @@ public class AuthService {
                 List.of(new SimpleGrantedAuthority(user.getRole().name()))
         ));
 
-        return new JwtResponse(token);
+        return new JwtResponse(token, user.getUsername(), user.getRole());
     }
 
     public JwtResponse register(RegisterUserRequest request){
@@ -62,6 +62,6 @@ public class AuthService {
                 List.of(new SimpleGrantedAuthority(user.getRole().name())))
         );
 
-        return new JwtResponse(token);
+        return new JwtResponse(token, user.getUsername(), user.getRole());
     }
 }

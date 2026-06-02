@@ -1,9 +1,8 @@
-package com.foodDelivery.project.controllerTest;
+package com.foodDelivery.project.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foodDelivery.project.domen.request.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;

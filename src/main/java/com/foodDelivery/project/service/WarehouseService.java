@@ -2,7 +2,6 @@ package com.foodDelivery.project.service;
 
 import com.foodDelivery.project.domen.dto.WarehouseDTO;
 import com.foodDelivery.project.domen.model.Product;
-import com.foodDelivery.project.domen.model.Warehouse;
 
 import java.util.List;
 
