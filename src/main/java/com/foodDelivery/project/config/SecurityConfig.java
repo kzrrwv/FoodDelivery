@@ -4,6 +4,7 @@ import com.foodDelivery.project.security.JwtAuthFilter;
 import com.foodDelivery.project.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,7 +26,7 @@ public class SecurityConfig {
     private UserServiceImpl service;
     private JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(UserServiceImpl service, JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(@Lazy UserServiceImpl service, JwtAuthFilter jwtAuthFilter) {
         this.service = service;
         this.jwtAuthFilter = jwtAuthFilter;
     }

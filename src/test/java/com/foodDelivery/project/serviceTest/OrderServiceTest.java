@@ -17,27 +17,16 @@ import com.foodDelivery.project.service.impl.ReviewServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -70,363 +59,248 @@ class OrderServiceTest {
     private User testCourier;
     private Product testProduct;
     private Order testOrder;
+    private OrderDTO testOrderDTO;
 
     @BeforeEach
     void setUp() {
         testUser = new User();
         testUser.setId(1L);
-        testUser.setUsername("testuser");
+        testUser.setUsername("john_doe");
         testUser.setRole(UserRole.ROLE_USER);
 
         testCourier = new User();
         testCourier.setId(2L);
-        testCourier.setUsername("courier");
         testCourier.setRole(UserRole.ROLE_COURIER);
 
         testProduct = new Product();
-        testProduct.setId(1L);
-        testProduct.setName("Pizza Margherita");
+        testProduct.setId(10L);
+        testProduct.setName("Pizza");
         testProduct.setPrice(500);
-        testProduct.setAmount(100);
+        testProduct.setAmount(10);
 
         testOrder = new Order();
-        testOrder.setId(1L);
+        testOrder.setId(100L);
         testOrder.setUser_id(testUser);
-        testOrder.setTotalAmount(1000);
         testOrder.setStatus(OrderStatus.CREATED);
-        testOrder.setDeliveryFee(100);
-        testOrder.setComment("Test comment");
-        testOrder.setPaymentMethod(PaymentMethod.CARD);
-        testOrder.setOrderItems(new ArrayList<>());
+        testOrder.setTotalAmount(1000);
 
-        // Mock SecurityContext
+        testOrderDTO = new OrderDTO();
+        testOrderDTO.setTotalAmount(1000);
+        testOrderDTO.setDeliveryFee(100);
+        testOrderDTO.setStatus(OrderStatus.CREATED);
+        testOrderDTO.setComment("Fast delivery please");
+        testOrderDTO.setPaymentMethod(PaymentMethod.CARD);
+        testOrderDTO.setRating(5);
+        testOrderDTO.setProductsId(List.of(
+                new ProductAndAmount(10L, 2)
+        ));
+    }
+
+    @BeforeEach
+    void setupSecurityContext() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        when(authentication.getName()).thenReturn("testuser");
+        when(authentication.getName()).thenReturn("john_doe");
     }
 
-    // ===== ПОЗИТИВНЫЕ СЦЕНАРИИ (4 теста) =====
+    //1 тест исключения
+    @Test
+    void createOrder_WhenUserNotFound_ShouldThrowBusinessExceptionWithCorrectMessageAndStatus() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("unknown_user");
+        when(userRepository.findUserByUsername("unknown_user")).thenReturn(Optional.empty());
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> orderService.createOrder(testOrderDTO));
+
+        assertEquals(" Возникла ошибка: Пользователь не найден", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+    }
+    //позитивные сценарии
 
     @Test
-    void shouldCreateOrder_whenValidData() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
+    void createOrder_Success_ShouldCreateOrderAndReview() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
         when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        ProductAndAmount productAmount = new ProductAndAmount();
-        productAmount.setId(1L);
-        productAmount.setAmount(2);
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setTotalAmount(1000);
-        orderDTO.setDeliveryFee(100);
-        orderDTO.setStatus(OrderStatus.CREATED);
-        orderDTO.setComment("Please deliver quickly");
-        orderDTO.setPaymentMethod(PaymentMethod.CARD);
-        orderDTO.setProductsId(List.of(productAmount));
-        orderDTO.setRating(5);
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-
-        Review mockReview = new Review();
-        mockReview.setId(1L);
         when(reviewService.createReviewWithOrder(any(ReviewDTO.class), any(Order.class)))
-                .thenReturn(mockReview);
+                .thenReturn(new Review());
 
-        // Act
-        orderService.createOrder(orderDTO);
+        assertDoesNotThrow(() -> orderService.createOrder(testOrderDTO));
 
-        // Assert
-        verify(orderRepository, atLeastOnce()).save(any(Order.class));
-        verify(productRepository).save(testProduct);
-        verify(reviewService).createReviewWithOrder(any(ReviewDTO.class), any(Order.class));
-        assertThat(testProduct.getAmount()).isEqualTo(98);
+        verify(productRepository, times(1)).save(testProduct);
+        verify(orderRepository, times(2)).save(any(Order.class));
+        verify(reviewService).createReviewWithOrder(any(ReviewDTO.class), eq(testOrder));
+        assertEquals(8, testProduct.getAmount()); // 10 - 2
     }
 
     @Test
-    void shouldGetOrdersByCurrentUser() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
+    void getOrders_Success_ShouldReturnListOfOrders() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
         when(orderRepository.findOrdersByUserId(1L)).thenReturn(List.of(testOrder));
 
-        // Act
         List<OrderToRetrieve> result = orderService.getOrders();
 
-        // Assert
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getId()).isEqualTo(1L);
-        assertThat(result.get(0).getComment()).isEqualTo("Test comment");
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(100L, result.get(0).getId());
         verify(orderRepository).findOrdersByUserId(1L);
     }
 
     @Test
-    void shouldGetOrderById_whenUserOwnsOrder() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
+    void getOrderById_Success_ShouldReturnOrder() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(testOrder));
 
-        // Act
-        OrderToRetrieve result = orderService.getOrderById(1L);
+        OrderToRetrieve result = orderService.getOrderById(100L);
 
-        // Assert
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.CREATED.name());
-        verify(orderRepository).findById(1L);
+        assertNotNull(result);
+        assertEquals(100L, result.getId());
+        verify(orderRepository).findById(100L);
     }
 
     @Test
-    void shouldUpdateOrder_whenUserOwnsOrder() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
+    void updateOrder_Success_ShouldUpdateOrderAndReturnDTO() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(testOrder));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
 
-        OrderDTO updateDTO = new OrderDTO();
-        updateDTO.setTotalAmount(1500);
-        updateDTO.setDeliveryFee(150);
-        updateDTO.setComment("Updated comment");
-        updateDTO.setRating(4);
-        updateDTO.setStatus(OrderStatus.ON_THE_WAY);
-        updateDTO.setDeliveredAt(LocalDateTime.now());
+        OrderDTO updated = orderService.updateOrder(100L, testOrderDTO);
 
-        // Act
-        OrderDTO result = orderService.updateOrder(1L, updateDTO);
-
-        // Assert
+        assertNotNull(updated);
         verify(orderRepository).save(testOrder);
-        assertThat(result.getTotalAmount()).isEqualTo(1500);
-    }
-
-    // ===== НЕГАТИВНЫЕ СЦЕНАРИИ (4 теста с исключениями) =====
-
-    @Test
-    void shouldThrowException_whenUserNotFound() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.empty());
-
-        OrderDTO orderDTO = new OrderDTO();
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> orderService.createOrder(orderDTO));
-
-        assertThat(exception.getMessage()).contains("Пользователь не найден");
-        assertThat(exception.getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    void shouldThrowException_whenCourierNotFound() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.empty());
+    void deleteOrder_Success_ShouldDeleteAndRestoreStock() {
+        testOrder.setOrderItems(List.of());
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(testOrder));
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setProductsId(new ArrayList<>());
+        assertDoesNotThrow(() -> orderService.deleteOrder(100L));
 
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> orderService.createOrder(orderDTO));
-
-        assertThat(exception.getMessage()).contains("Курьер не найден");
-    }
-
-    @Test
-    void shouldThrowException_whenProductNotFound() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        ProductAndAmount productAmount = new ProductAndAmount();
-        productAmount.setId(999L);
-        productAmount.setAmount(1);
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setProductsId(List.of(productAmount));
-        orderDTO.setTotalAmount(100);
-
-        when(productRepository.findById(999L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> orderService.createOrder(orderDTO));
-
-        assertThat(exception.getMessage()).contains("Продукт не найден");
-    }
-
-    @Test
-    void shouldThrowException_whenProductOutOfStock() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        testProduct.setAmount(0);
-
-        ProductAndAmount productAmount = new ProductAndAmount();
-        productAmount.setId(1L);
-        productAmount.setAmount(1);
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setProductsId(List.of(productAmount));
-        orderDTO.setTotalAmount(100);
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
-                () -> orderService.createOrder(orderDTO));
-
-        assertThat(exception.getMessage()).contains("Товар закончился на складе");
-    }
-
-    // ===== ПРОВЕРКА ВЗАИМОДЕЙСТВИЙ С VERIFY (3 теста) =====
-
-    @Test
-    void shouldCallRepositorySave_whenCreatingOrder() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setTotalAmount(500);
-        orderDTO.setProductsId(new ArrayList<>());
-
-        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        Review mockReview = new Review();
-        when(reviewService.createReviewWithOrder(any(), any())).thenReturn(mockReview);
-
-        // Act
-        orderService.createOrder(orderDTO);
-
-        // Assert
-        verify(orderRepository, atLeast(1)).save(any(Order.class));
-    }
-
-    @Test
-    void shouldNotCallRepositorySave_whenProductOutOfStock() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        testProduct.setAmount(0);
-
-        ProductAndAmount productAmount = new ProductAndAmount();
-        productAmount.setId(1L);
-        productAmount.setAmount(1);
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setProductsId(List.of(productAmount));
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-
-        // Act & Assert
-        assertThrows(BusinessException.class, () -> orderService.createOrder(orderDTO));
-
-        verify(orderRepository, never()).save(any(Order.class));
-    }
-
-    @Test
-    void shouldCallDelete_whenDeletingOwnOrder() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
-        testOrder.setOrderItems(new ArrayList<>());
-
-        // Act
-        orderService.deleteOrder(1L);
-
-        // Assert
         verify(orderRepository).delete(testOrder);
     }
 
-    // ===== ARGUMENT CAPTOR (1 тест) =====
+    //негативные сценарии
 
     @Test
-    void shouldPassCorrectDataToRepository_whenCreatingOrder() {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
+    void createOrder_UserNotFound_ShouldThrowException() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.empty());
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.createOrder(testOrderDTO));
+
+        assertEquals(" Возникла ошибка: Пользователь не найден", ex.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, ex.getHttpStatus());
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void createOrder_CourierNotFound_ShouldThrowException() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.empty());
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.createOrder(testOrderDTO));
+
+        assertEquals(" Возникла ошибка: Курьер не найден!", ex.getMessage());
+    }
+
+    @Test
+    void createOrder_ProductNotFound_ShouldThrowException() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
         when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
+        when(productRepository.findById(10L)).thenReturn(Optional.empty());
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setTotalAmount(2000);
-        orderDTO.setDeliveryFee(150);
-        orderDTO.setStatus(OrderStatus.CREATED);
-        orderDTO.setComment("Leave at door");
-        orderDTO.setPaymentMethod(PaymentMethod.CASH);
-        orderDTO.setProductsId(new ArrayList<>());
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.createOrder(testOrderDTO));
 
+        assertEquals(" Возникла ошибка: Продукт не найден!", ex.getMessage());
+    }
+
+    @Test
+    void createOrder_NotEnoughStock_ShouldThrowException() {
+        testProduct.setAmount(1);
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.createOrder(testOrderDTO));
+
+        assertEquals(" Возникла ошибка: Товар закончился на складе!", ex.getMessage());
+    }
+
+    @Test
+    void getOrderById_OrderBelongsToAnotherUser_ShouldThrowException() {
+        User anotherUser = new User();
+        anotherUser.setId(99L);
+        testOrder.setUser_id(anotherUser);
+
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(testOrder));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.getOrderById(100L));
+
+        assertEquals(" Возникла ошибка: Это не ваш заказ", ex.getMessage());
+        assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
+    }
+
+    //verify
+    @Test
+    void createOrder_WhenStockSufficient_ShouldCallProductRepositorySave() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        Review mockReview = new Review();
-        when(reviewService.createReviewWithOrder(any(), any())).thenReturn(mockReview);
+        when(reviewService.createReviewWithOrder(any(), any())).thenReturn(new Review());
+
+        orderService.createOrder(testOrderDTO);
+
+        verify(productRepository, times(1)).save(testProduct);
+        assertEquals(8, testProduct.getAmount());
+    }
+
+    @Test
+    void updateOrder_WhenReviewExists_ShouldUpdateReviewFields() {
+        Review existingReview = new Review();
+        existingReview.setComment("Old comment");
+        existingReview.setRating(3);
+        testOrder.setReview_id(existingReview);
+
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(orderRepository.findById(100L)).thenReturn(Optional.of(testOrder));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+
+        orderService.updateOrder(100L, testOrderDTO);
+
+        assertEquals("Fast delivery please", existingReview.getComment());
+        assertEquals(5, existingReview.getRating());
+    }
+
+    //argument captor
+
+    @Test
+    void createOrder_ShouldPassCorrectProductsToOrderItems() {
+        when(userRepository.findUserByUsername("john_doe")).thenReturn(Optional.of(testUser));
+        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(testProduct));
+        when(orderRepository.save(any(Order.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(reviewService.createReviewWithOrder(any(), any())).thenReturn(new Review());
+
+        orderService.createOrder(testOrderDTO);
 
         ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
-
-        // Act
-        orderService.createOrder(orderDTO);
-
-        // Assert
         verify(orderRepository, atLeastOnce()).save(orderCaptor.capture());
+
         Order capturedOrder = orderCaptor.getValue();
-
-        assertThat(capturedOrder.getTotalAmount()).isEqualTo(2000);
-        assertThat(capturedOrder.getDeliveryFee()).isEqualTo(150);
-        assertThat(capturedOrder.getComment()).isEqualTo("Leave at door");
-        assertThat(capturedOrder.getPaymentMethod()).isEqualTo(PaymentMethod.CASH);
-        assertThat(capturedOrder.getUser_id()).isEqualTo(testUser);
-    }
-
-    // ===== ПАРАМЕТРИЗОВАННЫЕ ТЕСТЫ (2 теста) =====
-
-    @ParameterizedTest
-    @CsvSource({
-            "1, 100, 99",
-            "5, 100, 95",
-            "10, 50, 40",
-            "0, 100, 100"
-    })
-    void shouldDecreaseProductAmountCorrectly(int amountToBuy, int initialAmount, int expectedRemaining) {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(userRepository.findUserByRole(UserRole.ROLE_COURIER)).thenReturn(Optional.of(testCourier));
-
-        testProduct.setAmount(initialAmount);
-
-        ProductAndAmount productAmount = new ProductAndAmount();
-        productAmount.setId(1L);
-        productAmount.setAmount(amountToBuy);
-
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setProductsId(List.of(productAmount));
-        orderDTO.setTotalAmount(1000);
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(testProduct));
-        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        Review mockReview = new Review();
-        when(reviewService.createReviewWithOrder(any(), any())).thenReturn(mockReview);
-
-        // Act
-        orderService.createOrder(orderDTO);
-
-        // Assert
-        assertThat(testProduct.getAmount()).isEqualTo(expectedRemaining);
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = {1L, 5L, 10L, 100L})
-    void shouldReturnOrder_whenOrderExists(Long orderId) {
-        // Arrange
-        when(userRepository.findUserByUsername("testuser")).thenReturn(Optional.of(testUser));
-
-        Order order = new Order();
-        order.setId(orderId);
-        order.setUser_id(testUser);
-        order.setStatus(OrderStatus.CREATED);
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-
-        // Act
-        OrderToRetrieve result = orderService.getOrderById(orderId);
-
-        // Assert
-        assertThat(result.getId()).isEqualTo(orderId);
+        assertNotNull(capturedOrder.getOrderItems());
+        assertEquals(1, capturedOrder.getOrderItems().size());
+        assertEquals(2, capturedOrder.getOrderItems().get(0).getAmount());
+        assertEquals(500, capturedOrder.getOrderItems().get(0).getPrice());
+        assertEquals(testProduct, capturedOrder.getOrderItems().get(0).getProduct_id());
     }
 }

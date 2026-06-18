@@ -6,6 +6,7 @@ import com.foodDelivery.project.domen.model.Review;
 import com.foodDelivery.project.domen.model.User;
 import com.foodDelivery.project.domen.responce.ReviewToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
+import com.foodDelivery.project.repository.OrderRepository;
 import com.foodDelivery.project.repository.ReviewRepository;
 import com.foodDelivery.project.repository.UserRepository;
 import com.foodDelivery.project.service.ReviewService;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 //все методы изменения review сделать по пользователю
@@ -33,11 +35,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final UserRepository userRepository;
 
+    private final OrderRepository orderRepository;
+
     private static final Logger log = LoggerFactory.getLogger(ReviewServiceImpl.class);
     @Autowired
-    public ReviewServiceImpl(ReviewRepository repository, UserRepository userRepository) {
+    public ReviewServiceImpl(ReviewRepository repository, UserRepository userRepository, OrderRepository orderRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
     }
 
     private User getCurrentUser(){
@@ -51,6 +56,49 @@ public class ReviewServiceImpl implements ReviewService {
                         "Пользователь не найден!",
                         HttpStatus.NOT_FOUND
                 ));
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public void createReview(ReviewDTO reviewDTO, Long orderId) {
+
+        User currentUser = getCurrentUser();
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException("Заказ не найден!", HttpStatus.NOT_FOUND));
+
+        if (!order.getUser_id().getId().equals(currentUser.getId())) {
+            throw new BusinessException("Вы можете оставить отзыв только к своему заказу!", HttpStatus.FORBIDDEN);
+        }
+
+        if (!"DELIVERED".equals(order.getStatus().name())) {
+            throw new BusinessException("Отзыв можно оставить только к доставленному заказу!", HttpStatus.BAD_REQUEST);
+        }
+
+        // Проверяем, есть ли уже отзыв
+        if (order.getReview_id() != null) {
+            // Если отзыв уже есть - обновляем его
+            Review existingReview = order.getReview_id();
+            existingReview.setRating(reviewDTO.getRating());
+            existingReview.setComment(reviewDTO.getComment());
+            existingReview.setCreatedAt(LocalDateTime.now());
+            repository.save(existingReview);
+            log.info("Отзыв к заказу {} обновлен", orderId);
+        } else {
+            // Создаем новый отзыв
+            Review review = new Review();
+            review.setRating(reviewDTO.getRating());
+            review.setComment(reviewDTO.getComment());
+            review.setCreatedAt(LocalDateTime.now());
+            review.setUser_id(currentUser);
+            review.setOrder_id(order);
+
+            Review savedReview = repository.save(review);
+            order.setReview_id(savedReview);
+            orderRepository.save(order);
+            log.info("Новый отзыв к заказу {} создан", orderId);
+        }
     }
 
     @Override
@@ -86,8 +134,13 @@ public class ReviewServiceImpl implements ReviewService {
         for(Review review : all){
             ReviewToRetrieve reviewToRetrieve = new ReviewToRetrieve();
 
+            reviewToRetrieve.setId(review.getId());
             reviewToRetrieve.setComment(review.getComment());
             reviewToRetrieve.setRating(review.getRating());
+
+            if (review.getOrder_id() != null) {
+                reviewToRetrieve.setOrderId(review.getOrder_id().getId());
+            }
 
             reviewToRetrieves.add(reviewToRetrieve);
         }
@@ -168,6 +221,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ROLE_USER')")
     public void delete(Long id) {
         Review review = repository.findById(id)
@@ -181,7 +235,16 @@ public class ReviewServiceImpl implements ReviewService {
                     HttpStatus.FORBIDDEN
             );
         }
+
+        Order order = review.getOrder_id();
+        if (order != null) {
+            System.out.println("Отвязываем отзыв от заказа " + order.getId());
+            order.setReview_id(null);
+            orderRepository.save(order);  // Сохраняем заказ без отзыва
+        }
+
         repository.delete(review);
+        repository.flush();
 
         log.info("Отзыв с id {} успешно удален.", id);
     }

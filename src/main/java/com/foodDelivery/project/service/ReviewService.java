@@ -21,4 +21,6 @@ public interface ReviewService {
     ReviewToRetrieve getReviewById(Long id);
 
     Review createReviewWithOrder(ReviewDTO reviewDTO, Order order);
+
+    void createReview(ReviewDTO reviewDTO, Long orderId);
 }

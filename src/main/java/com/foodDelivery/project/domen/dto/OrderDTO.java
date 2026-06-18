@@ -33,7 +33,7 @@ public class OrderDTO {
     @NotNull
     private PaymentMethod paymentMethod;
 
-    @NotNull
+
     private List<ProductAndAmount> productsId;
 
     public List<ProductAndAmount> getProductsId() {

@@ -5,6 +5,14 @@ public class ProductAndAmount {
 
     private int amount;
 
+    public ProductAndAmount(Long id, int amount) {
+        this.id = id;
+        this.amount = amount;
+    }
+
+    public ProductAndAmount() {
+    }
+
     public Long getId() {
         return id;
     }

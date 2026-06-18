@@ -2,6 +2,9 @@ package com.foodDelivery.project.domen.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Product {
 
@@ -19,9 +22,20 @@ public class Product {
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse_id;
 
+    @OneToMany(mappedBy = "product_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
 
     public Product() {
 
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 
     public Long getId() {

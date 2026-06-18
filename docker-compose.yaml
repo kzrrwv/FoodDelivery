@@ -58,6 +58,39 @@ services:
 
     networks:
       - food-network
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: foodLoki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml
+      - loki-data:/loki
+      - loki-wal:/wal  # Добавляем отдельный volume для WAL
+    user: "10001:10001"  # Запускаем от пользователя loki
+    networks:
+      - food-network
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: foodAlloy
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+    depends_on:
+      - loki
+    networks:
+      - food-network
 networks:
   food-network:
     driver: bridge
+volumes:
+  loki-data:
+  loki-wal:

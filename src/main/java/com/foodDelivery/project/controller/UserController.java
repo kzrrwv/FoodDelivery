@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +46,12 @@ public class UserController {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
+    @GetMapping("/current")
+    @Operation(summary = "Получить текущего пользователя")
+    public ResponseEntity<UserToRetrieve> getCurrentUser() {
+        return ResponseEntity.ok(service.getCurrentUser());
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Обновить пользователя")
     public ResponseEntity<UserDTO> updateUser(
@@ -52,6 +59,12 @@ public class UserController {
             @RequestBody @Valid UserDTO userDTO){
 
         return ResponseEntity.ok(service.updateUser(id, userDTO));
+    }
+
+    @PutMapping("/current")
+    @Operation(summary = "Обновить текущего пользователя")
+    public ResponseEntity<UserToRetrieve> updateCurrentUser(@RequestBody @Valid UserDTO userDTO) {
+        return ResponseEntity.ok(service.updateCurrentUser(userDTO));
     }
 
     @PatchMapping("/{id}/role")

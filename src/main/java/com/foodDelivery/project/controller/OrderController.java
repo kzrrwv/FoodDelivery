@@ -1,6 +1,7 @@
 package com.foodDelivery.project.controller;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
+import com.foodDelivery.project.domen.dto.OrderStatusUpdateDTO;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,14 @@ public class OrderController {
         );
     }
 
+    @GetMapping("/admin/all")
+    @Operation(summary = "Получить все заказы всех пользователей (только для админа)")
+    public ResponseEntity<List<OrderToRetrieve>> getAllOrdersForAdmin(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(orderService.getAllOrdersForAdmin(PageRequest.of(page, size)));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Получить заказ по ID")
     public ResponseEntity<OrderToRetrieve> getOrderById(@PathVariable Long id){
@@ -66,6 +75,15 @@ public class OrderController {
             @RequestBody @Valid OrderDTO orderDTO){
 
         return ResponseEntity.ok(orderService.updateOrder(id, orderDTO));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Обновить статус заказа (для админа/курьера)")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody @Valid OrderStatusUpdateDTO statusDTO) {
+        orderService.updateOrderStatus(id, statusDTO.getStatus(), statusDTO.getComment());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

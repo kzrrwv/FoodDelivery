@@ -1,0 +1,61 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+  wal:
+    dir: /loki/wal
+  flush_op_timeout: 10m
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/index_cache
+    shared_store: filesystem
+    cache_ttl: 24h
+    resync_interval: 5m
+  filesystem:
+    directory: /loki/chunks
+
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  ingestion_rate_mb: 10
+  ingestion_burst_size_mb: 20
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
+
+querier:
+  engine:
+    max_look_back_period: 168h
+
+query_range:
+  parallelise_shardable_queries: true
+
+frontend:
+  max_outstanding_per_tenant: 100
+
+common:
+  path_prefix: /loki
+  replication_factor: 1

@@ -4,6 +4,7 @@ import com.foodDelivery.project.domen.dto.OrderDTO;
 import com.foodDelivery.project.domen.dto.ProductAndAmount;
 import com.foodDelivery.project.domen.dto.ReviewDTO;
 import com.foodDelivery.project.domen.model.*;
+import com.foodDelivery.project.domen.model.enums.OrderStatus;
 import com.foodDelivery.project.domen.model.enums.UserRole;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import com.foodDelivery.project.exception.BusinessException;
@@ -271,6 +272,22 @@ public class OrderServiceImpl implements OrderService {
         return dto;
     }
 
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COURIER')")
+    public void updateOrderStatus(Long id, OrderStatus status, String comment) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new BusinessException("Заказ не найден", HttpStatus.NOT_FOUND));
+
+        order.setStatus(status);
+        if (comment != null) {
+            order.setComment(comment);
+        }
+        repository.save(order);
+
+        log.info("Статус заказа {} изменен на {}", id, status);
+    }
+
     //с заказом должны удаляться review, orderItem и восстанавливаться количество продутов
     @Override
     @PreAuthorize(value = "hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
@@ -316,5 +333,26 @@ public class OrderServiceImpl implements OrderService {
         repository.delete(order);
 
         log.info("Заказ с id {} успешно удален.", id);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<OrderToRetrieve> getAllOrdersForAdmin(PageRequest pageRequest) {
+        Page<Order> page = repository.findAll(pageRequest);
+
+        List<OrderToRetrieve> result = new ArrayList<>();
+
+        for (Order order : page.getContent()) {
+            OrderToRetrieve dto = new OrderToRetrieve();
+            dto.setId(order.getId());
+            dto.setComment(order.getComment());
+            dto.setStatus(order.getStatus());
+            dto.setDeliveryFee(order.getDeliveryFee());
+            dto.setTotalAmount(order.getTotalAmount());
+            result.add(dto);
+        }
+
+        log.info("Админ запросил все заказы. Найдено: {}", result.size());
+        return result;
     }
 }

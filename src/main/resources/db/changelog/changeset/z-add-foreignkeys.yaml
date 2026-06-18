@@ -73,7 +73,7 @@ databaseChangeLog:
             baseColumnNames: product_id
             referencedTableName: product
             referencedColumnNames: id
-            onDelete: RESTRICT
+            onDelete: SET NULL
             onUpdate: CASCADE
         - addForeignKeyConstraint:
             constraintName: fk_order_item_order

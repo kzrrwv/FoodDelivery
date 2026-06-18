@@ -20,13 +20,15 @@ public class JwtService {
     private String jwtSigningKey = "53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855";
 
     public String generateToken(UserDetails userDetails){
-        HashMap<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
 
-        if(userDetails instanceof User customUser){
-            claims.put("id", customUser.getId());
-            claims.put("email", customUser.getEmail());
-            claims.put("role", customUser.getRole());
-        }
+
+        claims.put("role", userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .orElse("ROLE_USER"));
+
+        claims.put("username", userDetails.getUsername());
 
         return generateToken(claims, userDetails);
     }

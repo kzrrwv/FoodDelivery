@@ -32,8 +32,9 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
-    public UserServiceImpl(UserRepository repository) {
+    public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDetailsService userDetailsService(){
@@ -47,6 +48,24 @@ public class UserServiceImpl implements UserService {
                     );
         };
     }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public UserToRetrieve getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = repository.findUserByUsername(username)
+                .orElseThrow(() -> new BusinessException("Пользователь не найден", HttpStatus.NOT_FOUND));
+
+        UserToRetrieve dto = new UserToRetrieve();
+        dto.setUserName(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+
+        return dto;
+    }
+
 
     @Override
     @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
@@ -92,7 +111,10 @@ public class UserServiceImpl implements UserService {
         List<User> all = repository.findAll();
         List<UserToRetrieve> userToRetrieves = new ArrayList<>();
         for(User user : all){
+
             UserToRetrieve userToRetrieve = new UserToRetrieve();
+            userToRetrieve.setId(user.getId());
+            userToRetrieve.setRole(user.getRole().name());
             userToRetrieve.setUserName(user.getUsername());
             userToRetrieve.setEmail(user.getEmail());
             userToRetrieves.add(userToRetrieve);
@@ -179,6 +201,7 @@ public class UserServiceImpl implements UserService {
         UserToRetrieve dto = new UserToRetrieve();
         dto.setUserName(saved.getUsername());
         dto.setEmail(saved.getEmail());
+        dto.setPhoneNumber(saved.getPhoneNumber());
 
         return dto;
     }

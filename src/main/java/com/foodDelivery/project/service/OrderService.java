@@ -1,6 +1,7 @@
 package com.foodDelivery.project.service;
 
 import com.foodDelivery.project.domen.dto.OrderDTO;
+import com.foodDelivery.project.domen.model.enums.OrderStatus;
 import com.foodDelivery.project.domen.responce.OrderToRetrieve;
 import org.springframework.data.domain.PageRequest;
 
@@ -19,4 +20,8 @@ public interface OrderService {
     void deleteOrder(Long id);
 
     OrderToRetrieve getOrderById(Long id);
+
+    List<OrderToRetrieve> getAllOrdersForAdmin(PageRequest pageRequest);
+
+    void updateOrderStatus(Long id, OrderStatus status, String comment);
 }

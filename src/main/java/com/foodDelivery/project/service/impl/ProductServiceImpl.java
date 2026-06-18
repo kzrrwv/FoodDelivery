@@ -155,6 +155,14 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         Product product = repository.findById(id)
                 .orElseThrow(() -> new BusinessException("Продукт не найден!", HttpStatus.NOT_FOUND));
+
+        if (product.getOrderItems() != null && !product.getOrderItems().isEmpty()) {
+            throw new BusinessException(
+                    "Нельзя удалить продукт, который уже есть в заказах!",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         repository.delete(product);
         log.info("Продукт с id {} успешно удален.", id);
     }

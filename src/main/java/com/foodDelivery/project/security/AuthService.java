@@ -37,11 +37,7 @@ public class AuthService {
             throw new RuntimeException();
         }
         User user = userByUsername.get();
-        String token = jwtService.generateToken(new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority(user.getRole().name()))
-        ));
+        String token = jwtService.generateToken(user);
 
         return new JwtResponse(token, user.getUsername(), user.getRole());
     }

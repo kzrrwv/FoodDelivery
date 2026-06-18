@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +26,22 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    @PostMapping
+    @Operation(summary = "Создать отзыв к заказу")
+    public ResponseEntity<Void> createReview(
+            @RequestBody @Valid ReviewDTO reviewDTO,
+            @RequestParam Long orderId) {
+        reviewService.createReview(reviewDTO, orderId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
     @GetMapping
     @Operation(summary = "Получить отзывы")
     public ResponseEntity<List<ReviewToRetrieve>> getReviews(){
         return ResponseEntity.ok(reviewService.getReviews());
     }
+
     @GetMapping("/page")
     @Operation(summary = "Получить отзывы пагинация")
     public ResponseEntity<List<ReviewToRetrieve>> getReviewsWithPageable(
